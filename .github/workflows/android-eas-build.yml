@@ -19,10 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
-      EXPO_OWNER: ${{ vars.EXPO_OWNER }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -36,6 +32,12 @@ jobs:
           node-version: 24
           cache: pnpm
 
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -45,21 +47,14 @@ jobs:
       - name: Run type check
         run: pnpm exec tsc --noEmit
 
-      - name: Start EAS Android build
+      - name: Build Android locally with EAS
         run: >-
           pnpm dlx --config.ignore-scripts=true eas-cli@19.1.0 build
           --platform android
           --profile ${{ inputs.profile }}
+          --local
           --non-interactive
-          --wait
-
-      - name: Download latest Android build artifact
-        run: >-
-          pnpm dlx --config.ignore-scripts=true eas-cli@19.1.0 build:download
-          --platform android
-          --latest
-          --non-interactive
-          --path android-${{ inputs.profile }}.${{ inputs.profile == 'production' && 'aab' || 'apk' }}
+          --output android-${{ inputs.profile }}.${{ inputs.profile == 'production' && 'aab' || 'apk' }}
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v6
