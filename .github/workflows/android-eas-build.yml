@@ -56,10 +56,18 @@ jobs:
           --profile ${{ inputs.profile }}
           --local
           --non-interactive
-          --output android-${{ inputs.profile }}.${{ inputs.profile == 'production' && 'aab' || 'apk' }}
 
-      - name: Upload Android artifact
+      - name: Collect build outputs
+        run: |
+          mkdir -p build-artifacts
+          if [ -d android/app/build/outputs ]; then
+            find android/app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) -exec cp {} build-artifacts/ \;
+          fi
+          find . -maxdepth 1 -type f \( -name "*.apk" -o -name "*.aab" \) -exec cp {} build-artifacts/ \;
+          ls -la build-artifacts/
+
+      - name: Upload Android artifacts
         uses: actions/upload-artifact@v6
         with:
           name: android-${{ inputs.profile }}
-          path: android-${{ inputs.profile }}.${{ inputs.profile == 'production' && 'aab' || 'apk' }}
+          path: build-artifacts/

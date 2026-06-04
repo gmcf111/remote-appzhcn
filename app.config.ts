@@ -98,6 +98,7 @@ export default {
     "expo-background-task",
     "./plugins/with-intents.ts",
     "./plugins/with-user-ca.ts",
+    "./plugins/with-abis-splits.ts",
     ...proPlugins,
   ],
   experiments: {
