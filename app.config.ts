@@ -12,7 +12,6 @@ const versionCode = major * 10_000 + minor * 100 + patch;
 
 const proPackagePath = path.resolve(process.cwd(), "packages/pro/package.json");
 const hasProPackage = fs.existsSync(proPackagePath);
-const easProjectId = process.env.EAS_PROJECT_ID;
 
 const proPlugins: (string | [string, unknown])[] = hasProPackage
   ? ["./packages/pro/plugins/with-torrent-engine.ts"]
@@ -105,6 +104,8 @@ export default {
     typedRoutes: true,
   },
   extra: {
-    eas: easProjectId ? { projectId: easProjectId } : undefined,
+    eas: {
+      projectId: "5c267c32-bf92-4346-be2b-1085f33264ff",
+    },
   },
 } satisfies ExpoConfig;
