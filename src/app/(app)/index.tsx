@@ -46,7 +46,7 @@ function SearchInput({ onSubmit }: { onSubmit: (query: string) => void }) {
       value={text}
       onChangeText={setText}
       onSubmitEditing={() => onSubmit(text)}
-      placeholder="Search torrents..."
+      placeholder="搜索种子..."
       returnKeyType="search"
       style={styles.searchInput}
       containerStyle={styles.searchContainer}
@@ -72,7 +72,7 @@ export default function TorrentsScreen() {
   const { start, stop } = useTorrentActions();
   const torrentActionsSheet = useTorrentActionsSheet();
   const listingSheet = useListingSheet();
-  const { available, isPro } = usePro();
+  const { available } = usePro();
   const serverSelectorSheet = useServerSelectorSheet();
 
   const {
@@ -115,7 +115,7 @@ export default function TorrentsScreen() {
   );
 
   React.useEffect(() => {
-    const title = !server || server.name === "" ? "Remote" : server.name;
+    const title = !server || server.name === "" ? "远程" : server.name;
     if (searching) {
       navigation.setOptions({
         headerTitle: () => <SearchInput onSubmit={setSearchQuery} />,
@@ -184,11 +184,6 @@ export default function TorrentsScreen() {
           }
 
           const onIndexerSearch = () => {
-            if (!isPro) {
-              router.push("/paywall");
-              return;
-            }
-
             if (searchConfig) {
               router.push("/search");
             } else {
@@ -250,7 +245,6 @@ export default function TorrentsScreen() {
     servers,
     searchConfig,
     available,
-    isPro,
     serverSelectorSheet,
     torrentActionsSheet,
     torrents,
@@ -283,9 +277,9 @@ export default function TorrentsScreen() {
   if (servers.length === 0) {
     return (
       <Screen style={styles.message}>
-        <Text style={styles.title}>No connection found</Text>
+        <Text style={styles.title}>未找到连接</Text>
         <Button
-          title="Setup connection"
+          title="设置连接"
           onPress={() => router.push("/settings/connection")}
         />
       </Screen>
@@ -309,8 +303,8 @@ export default function TorrentsScreen() {
           contentContainerStyle={styles.emptyList}
           ListEmptyComponent={
             <View style={styles.message}>
-              <Text style={styles.title}>No torrents found</Text>
-              <Button title="Add a torrent" onPress={() => router.push("/add")} />
+              <Text style={styles.title}>未找到种子</Text>
+              <Button title="添加种子" onPress={() => router.push("/add")} />
             </View>
           }
           refreshControl={
@@ -332,7 +326,7 @@ export default function TorrentsScreen() {
         ItemSeparatorComponent={Separator}
         ListEmptyComponent={
           <View style={styles.message}>
-            <Text style={styles.noResults}>No results</Text>
+            <Text style={styles.noResults}>无结果</Text>
           </View>
         }
         contentContainerStyle={render.length === 0 && styles.emptyList}

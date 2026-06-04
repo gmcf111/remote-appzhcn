@@ -30,84 +30,84 @@ export default function TorrentDetailsScreen() {
 
     return [
       {
-        section: "Info",
+        section: "信息",
         data: [
           {
-            field: "Name",
+            field: "名称",
             value: torrent.name,
           },
           {
-            field: "Status",
+            field: "状态",
             value: formatStatus(torrent.status),
           },
           {
-            field: "Magnet Link",
+            field: "Magnet 链接",
             value: torrent.magnetLink,
             copy: true,
           },
         ],
       },
       {
-        section: "Data",
+        section: "数据",
         data: [
           {
-            field: "Progress",
+            field: "进度",
             value: `${(torrent.percentDone * 100).toFixed(1)}%`,
           },
           {
-            field: "Downloaded",
+            field: "已下载",
             value: formatSize(torrent.downloadedEver),
           },
           {
-            field: "Uploaded",
+            field: "已上传",
             value: `${formatSize(
               torrent.uploadedEver
             )} (${torrent.uploadRatio.toFixed(2)})`,
           },
           {
-            field: "Pieces",
+            field: "分块",
             value: `${count(torrent.pieces)}/${
               torrent.pieceCount
             } (${formatSize(torrent.pieceSize)})`,
           },
           {
-            field: "Peers",
+            field: "Peer",
             value: `${torrent.peersSendingToUs} - ${torrent.peersGettingFromUs}`,
           },
         ],
       },
       {
-        section: "Files",
+        section: "文件",
         data: [
           {
-            field: "Location",
+            field: "位置",
             value: torrent.downloadDir,
           },
           {
-            field: "Total Size",
+            field: "总大小",
             value: formatSize(torrent.totalSize),
           },
           {
-            field: "Files",
+            field: "文件",
             value: torrent.filesCount,
           },
         ],
       },
       {
-        section: "Dates",
+        section: "日期",
         data: [
           {
-            field: "Added",
+            field: "已添加",
             value: new Date(torrent.addedDate * 1000).toLocaleString(),
           },
           {
-            field: "Last activity",
+            field: "最后活动",
             value: new Date(torrent.activityDate * 1000).toLocaleString(),
           },
           ...(torrent.doneDate !== 0
             ? [
                 {
-                  field: "Completed",
+                  field: "已完成",
                   value: new Date(torrent.doneDate * 1000).toLocaleString(),
                 },
               ]

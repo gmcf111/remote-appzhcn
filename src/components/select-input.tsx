@@ -21,7 +21,7 @@ export type SelectInputProps = {
 export default React.memo(function SelectInput({
   style,
   title,
-  placeholder = "Select an option",
+  placeholder = "请选择选项",
   value,
   options = [],
   onChange,

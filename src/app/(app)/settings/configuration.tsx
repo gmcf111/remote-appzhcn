@@ -74,12 +74,12 @@ type Form = z.infer<typeof Form>;
 const Form = z
   .object({
     "speed-limit-down-enabled": z.boolean(),
-    "speed-limit-down": z.coerce.number({ message: "expected a number" }),
+    "speed-limit-down": z.coerce.number({ message: "请输入数字" }),
     "speed-limit-up-enabled": z.boolean(),
-    "speed-limit-up": z.coerce.number({ message: "expected a number" }),
+    "speed-limit-up": z.coerce.number({ message: "请输入数字" }),
     "alt-speed-enabled": z.boolean(),
-    "alt-speed-down": z.coerce.number({ message: "expected a number" }),
-    "alt-speed-up": z.coerce.number({ message: "expected a number" }),
+    "alt-speed-down": z.coerce.number({ message: "请输入数字" }),
+    "alt-speed-up": z.coerce.number({ message: "请输入数字" }),
     "alt-speed-time-enabled": z.boolean(),
     "alt-speed-time-begin-hour": z.coerce.number(),
     "alt-speed-time-begin-min": z.coerce.number(),
@@ -88,15 +88,15 @@ const Form = z
     "alt-speed-time-day": z.number(),
 
     "seedRatioLimited": z.boolean(),
-    "seedRatioLimit": z.coerce.number({ message: "expected a number" }),
+    "seedRatioLimit": z.coerce.number({ message: "请输入数字" }),
 
     "idle-seeding-limit-enabled": z.boolean(),
-    "idle-seeding-limit": z.coerce.number({ message: "expected a number" }),
+    "idle-seeding-limit": z.coerce.number({ message: "请输入数字" }),
 
     "download-queue-enabled": z.boolean(),
-    "download-queue-size": z.coerce.number({ message: "expected a number" }),
+    "download-queue-size": z.coerce.number({ message: "请输入数字" }),
     "seed-queue-enabled": z.boolean(),
-    "seed-queue-size": z.coerce.number({ message: "expected a number" }),
+    "seed-queue-size": z.coerce.number({ message: "请输入数字" }),
 
     "dht-enabled": z.boolean().optional(),
     "lpd-enabled": z.boolean().optional(),
@@ -107,57 +107,57 @@ const Form = z
       ctx.addIssue({
         path: ["speed-limit-down"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
     if (data["speed-limit-up-enabled"] && !data["speed-limit-up"]) {
       ctx.addIssue({
         path: ["speed-limit-up"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
     if (data["seedRatioLimited"] && !data["seedRatioLimit"]) {
       ctx.addIssue({
         path: ["seedRatioLimit"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
     if (data["idle-seeding-limit-enabled"] && !data["idle-seeding-limit"]) {
       ctx.addIssue({
         path: ["idle-seeding-limit"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
     if (data["download-queue-enabled"] && !data["download-queue-size"]) {
       ctx.addIssue({
         path: ["download-queue-size"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
     if (data["seed-queue-enabled"] && !data["seed-queue-size"]) {
       ctx.addIssue({
         path: ["seed-queue-size"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
   });
 
 const transmissionDayOptions: SelectOption[] = [
-  { id: "127", label: "Everyday", left: "calendar" as const, value: 127 },
-  { id: "62", label: "Weekdays", left: "calendar" as const, value: 62 },
-  { id: "65", label: "Weekends", left: "calendar" as const, value: 65 },
-  { id: "2", label: "Monday", left: "calendar" as const, value: 2 },
-  { id: "4", label: "Tuesday", left: "calendar" as const, value: 4 },
-  { id: "8", label: "Wednesday", left: "calendar" as const, value: 8 },
-  { id: "16", label: "Thursday", left: "calendar" as const, value: 16 },
-  { id: "32", label: "Friday", left: "calendar" as const, value: 32 },
-  { id: "64", label: "Saturday", left: "calendar" as const, value: 64 },
-  { id: "1", label: "Sunday", left: "calendar" as const, value: 1 },
+  { id: "127", label: "每天", left: "calendar" as const, value: 127 },
+  { id: "62", label: "工作日", left: "calendar" as const, value: 62 },
+  { id: "65", label: "周末", left: "calendar" as const, value: 65 },
+  { id: "2", label: "周一", left: "calendar" as const, value: 2 },
+  { id: "4", label: "周二", left: "calendar" as const, value: 4 },
+  { id: "8", label: "周三", left: "calendar" as const, value: 8 },
+  { id: "16", label: "周四", left: "calendar" as const, value: 16 },
+  { id: "32", label: "周五", left: "calendar" as const, value: 32 },
+  { id: "64", label: "周六", left: "calendar" as const, value: 64 },
+  { id: "1", label: "周日", left: "calendar" as const, value: 1 },
 ];
 
 function sessionToFormValues(s: Session): Form {
@@ -207,13 +207,13 @@ function ConfigurationForm({ server }: { server: Server }) {
         mutate(formValuesToSession(f), {
           onSuccess: () => {
             ToastAndroid.show(
-              "Server updated successfully",
+              "服务器已更新",
               ToastAndroid.SHORT
             );
             router.back();
           },
           onError: () => {
-            ToastAndroid.show("Failed to update server", ToastAndroid.SHORT);
+            ToastAndroid.show("更新服务器失败", ToastAndroid.SHORT);
           },
         });
       },
@@ -245,7 +245,7 @@ function ConfigurationForm({ server }: { server: Server }) {
         contentInset={{ bottom: inset.bottom }}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsSectionTitle title="Speed limits" first />
+        <SettingsSectionTitle title="速度限制" first />
 
         <View style={styles.row}>
           <Controller
@@ -253,7 +253,7 @@ function ConfigurationForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Download (KB/s)"
+                label="下载 (KB/s)"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -285,7 +285,7 @@ function ConfigurationForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Upload (KB/s)"
+                label="上传 (KB/s)"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -313,7 +313,7 @@ function ConfigurationForm({ server }: { server: Server }) {
 
         {!isLocal && (
           <>
-            <SettingsSectionTitle title="Alternative speed limits" />
+            <SettingsSectionTitle title="备用速度限制" />
 
             <View style={styles.row}>
               <Controller
@@ -323,15 +323,15 @@ function ConfigurationForm({ server }: { server: Server }) {
               <SettingsToggle
                 value={field.value}
                 onPress={field.onChange}
-                label="Enable alternative speed limits"
-                description="Use alternate upload and download limits."
+                label="启用备用速度限制"
+                description="使用备用上传和下载限制。"
               />
             )}
           />
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Download (kB/s)</Text>
+          <Text style={styles.label}>下载 (kB/s)</Text>
           <Controller
             name="alt-speed-down"
             control={control}
@@ -352,7 +352,7 @@ function ConfigurationForm({ server }: { server: Server }) {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Upload (kB/s)</Text>
+          <Text style={styles.label}>上传 (kB/s)</Text>
           <Controller
             name="alt-speed-up"
             control={control}
@@ -380,8 +380,8 @@ function ConfigurationForm({ server }: { server: Server }) {
               <SettingsToggle
                 value={field.value}
                 onPress={field.onChange}
-                label="Schedule alt speed limits"
-                description="Apply alternate limits by time and day."
+                label="定时启用备用速度限制"
+                description="按时间和日期应用备用限制。"
               />
             )}
           />
@@ -390,7 +390,7 @@ function ConfigurationForm({ server }: { server: Server }) {
         {watch("alt-speed-time-enabled") && (
           <>
             <View style={styles.row}>
-              <Text style={styles.label}>From</Text>
+              <Text style={styles.label}>从</Text>
               <SettingsInlineGroup>
                 <Controller
                   name="alt-speed-time-begin-hour"
@@ -423,7 +423,7 @@ function ConfigurationForm({ server }: { server: Server }) {
             </View>
 
             <View style={styles.row}>
-              <Text style={styles.label}>To</Text>
+              <Text style={styles.label}>到</Text>
               <SettingsInlineGroup>
                 <Controller
                   name="alt-speed-time-end-hour"
@@ -456,13 +456,13 @@ function ConfigurationForm({ server }: { server: Server }) {
             </View>
 
             <View style={styles.row}>
-              <Text style={styles.label}>Days</Text>
+              <Text style={styles.label}>日期</Text>
               <Controller
                 name="alt-speed-time-day"
                 control={control}
                 render={({ field }) => (
                   <SettingsSelectInput
-                    title="Days"
+                    title="日期"
                     value={field.value}
                     options={transmissionDayOptions}
                     onChange={field.onChange}
@@ -475,7 +475,7 @@ function ConfigurationForm({ server }: { server: Server }) {
           </>
         )}
 
-        <SettingsSectionTitle title="Seed" />
+        <SettingsSectionTitle title="做种" />
 
         <View style={styles.row}>
           <Controller
@@ -483,7 +483,7 @@ function ConfigurationForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Stop seeding at ratio"
+                label="达到分享率后停止做种"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -516,7 +516,7 @@ function ConfigurationForm({ server }: { server: Server }) {
               control={control}
               render={({ field }) => (
                 <SettingsToggleFieldLabel
-                  label="Stop seeding if idle (minutes)"
+                  label="空闲做种停止时间（分钟）"
                   value={field.value}
                   onPress={field.onChange}
                 />
@@ -543,7 +543,7 @@ function ConfigurationForm({ server }: { server: Server }) {
           </View>
         )}
 
-        <SettingsSectionTitle title="Queue" />
+        <SettingsSectionTitle title="队列" />
 
         <View style={styles.row}>
           <Controller
@@ -551,7 +551,7 @@ function ConfigurationForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Download queue size"
+                label="下载队列大小"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -583,7 +583,7 @@ function ConfigurationForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Seed queue size"
+                label="做种队列大小"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -611,7 +611,7 @@ function ConfigurationForm({ server }: { server: Server }) {
 
         {(server.type === "transmission" || server.type === "local") && (
           <>
-            <SettingsSectionTitle title="Peer discovery" />
+            <SettingsSectionTitle title="Peer 发现" />
 
             <View style={[styles.row, { gap: 16 }]}>
               <Controller
@@ -621,8 +621,8 @@ function ConfigurationForm({ server }: { server: Server }) {
                   <SettingsToggle
                     value={field.value ?? false}
                     onPress={field.onChange}
-                    label="Enable Distributed Hash Table"
-                    description="Find peers from the distributed network."
+                    label="启用 DHT"
+                    description="从分布式网络查找 Peer。"
                   />
                 )}
               />
@@ -633,8 +633,8 @@ function ConfigurationForm({ server }: { server: Server }) {
                   <SettingsToggle
                     value={field.value ?? false}
                     onPress={field.onChange}
-                    label="Enable Local Peer Discovery"
-                    description="Find peers on your local network."
+                    label="启用本地 Peer 发现"
+                    description="在本地网络中查找 Peer。"
                   />
                 )}
               />
@@ -646,8 +646,8 @@ function ConfigurationForm({ server }: { server: Server }) {
                     <SettingsToggle
                       value={field.value ?? false}
                       onPress={field.onChange}
-                      label="Enable Peer Exchange"
-                      description="Exchange peer lists with connected peers."
+                      label="启用 Peer 交换"
+                      description="与已连接 Peer 交换 Peer 列表。"
                     />
                   )}
                 />
@@ -707,29 +707,29 @@ const QBitForm = z.object({
 });
 
 const encryptionOptions: SelectOption[] = [
-  { id: "0", label: "Prefer encryption", left: "lock" as const, value: 0 },
-  { id: "1", label: "Force encryption", left: "lock" as const, value: 1 },
-  { id: "2", label: "Allow unencrypted", left: "unlock" as const, value: 2 },
+  { id: "0", label: "优先加密", left: "lock" as const, value: 0 },
+  { id: "1", label: "强制加密", left: "lock" as const, value: 1 },
+  { id: "2", label: "允许未加密", left: "unlock" as const, value: 2 },
 ];
 
 const schedulerDaysOptions: SelectOption[] = [
-  { id: "0", label: "Everyday", left: "calendar" as const, value: 0 },
-  { id: "1", label: "Weekdays", left: "calendar" as const, value: 1 },
-  { id: "2", label: "Weekends", left: "calendar" as const, value: 2 },
-  { id: "3", label: "Monday", left: "calendar" as const, value: 3 },
-  { id: "4", label: "Tuesday", left: "calendar" as const, value: 4 },
-  { id: "5", label: "Wednesday", left: "calendar" as const, value: 5 },
-  { id: "6", label: "Thursday", left: "calendar" as const, value: 6 },
-  { id: "7", label: "Friday", left: "calendar" as const, value: 7 },
-  { id: "8", label: "Saturday", left: "calendar" as const, value: 8 },
-  { id: "9", label: "Sunday", left: "calendar" as const, value: 9 },
+  { id: "0", label: "每天", left: "calendar" as const, value: 0 },
+  { id: "1", label: "工作日", left: "calendar" as const, value: 1 },
+  { id: "2", label: "周末", left: "calendar" as const, value: 2 },
+  { id: "3", label: "周一", left: "calendar" as const, value: 3 },
+  { id: "4", label: "周二", left: "calendar" as const, value: 4 },
+  { id: "5", label: "周三", left: "calendar" as const, value: 5 },
+  { id: "6", label: "周四", left: "calendar" as const, value: 6 },
+  { id: "7", label: "周五", left: "calendar" as const, value: 7 },
+  { id: "8", label: "周六", left: "calendar" as const, value: 8 },
+  { id: "9", label: "周日", left: "calendar" as const, value: 9 },
 ];
 
 const seedingActionOptions: SelectOption[] = [
-  { id: "0", label: "Stop torrent", left: "square" as const, value: 0 },
-  { id: "1", label: "Remove torrent", left: "trash" as const, value: 1 },
-  { id: "3", label: "Remove torrent and its files", left: "trash-2" as const, value: 3 },
-  { id: "2", label: "Enable super seeding", left: "zap" as const, value: 2 },
+  { id: "0", label: "停止种子", left: "square" as const, value: 0 },
+  { id: "1", label: "移除种子", left: "trash" as const, value: 1 },
+  { id: "3", label: "移除种子及其文件", left: "trash-2" as const, value: 3 },
+  { id: "2", label: "启用超级做种", left: "zap" as const, value: 2 },
 ];
 
 function prefsToFormValues(prefs: QBitPreferences): QBitForm {
@@ -782,11 +782,11 @@ function QBitConfigForm({ server }: { server: Server }) {
       (f: QBitForm) => {
         mutate(formValuesToPrefs(f), {
           onSuccess: () => {
-            ToastAndroid.show("Server updated successfully", ToastAndroid.SHORT);
+            ToastAndroid.show("服务器已更新", ToastAndroid.SHORT);
             router.back();
           },
           onError: () => {
-            ToastAndroid.show("Failed to update server", ToastAndroid.SHORT);
+            ToastAndroid.show("更新服务器失败", ToastAndroid.SHORT);
           },
         });
       },
@@ -823,7 +823,7 @@ function QBitConfigForm({ server }: { server: Server }) {
         contentInset={{ bottom: inset.bottom }}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsSectionTitle title="Connection limits" first />
+        <SettingsSectionTitle title="连接限制" first />
 
         <View style={styles.row}>
           <Controller
@@ -831,7 +831,7 @@ function QBitConfigForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Global max connections"
+                label="全局最大连接数"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -857,7 +857,7 @@ function QBitConfigForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Per-torrent max connections"
+                label="单种子最大连接数"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -883,7 +883,7 @@ function QBitConfigForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Global max upload slots"
+                label="全局最大上传槽数"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -909,7 +909,7 @@ function QBitConfigForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="Per-torrent max upload slots"
+                label="单种子最大上传槽数"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -929,10 +929,10 @@ function QBitConfigForm({ server }: { server: Server }) {
           />
         </View>
 
-        <SettingsSectionTitle title="Speed limits" />
+        <SettingsSectionTitle title="速度限制" />
 
         <View style={styles.row}>
-          <Text style={styles.label}>Download (KB/s, 0 = unlimited)</Text>
+          <Text style={styles.label}>下载 (KB/s，0 表示不限速)</Text>
           <Controller
             name="dl_limit"
             control={control}
@@ -947,7 +947,7 @@ function QBitConfigForm({ server }: { server: Server }) {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Upload (KB/s, 0 = unlimited)</Text>
+          <Text style={styles.label}>上传 (KB/s，0 表示不限速)</Text>
           <Controller
             name="up_limit"
             control={control}
@@ -961,10 +961,10 @@ function QBitConfigForm({ server }: { server: Server }) {
           />
         </View>
 
-        <SettingsSectionTitle title="Alternative speed limits" />
+        <SettingsSectionTitle title="备用速度限制" />
 
         <View style={styles.row}>
-          <Text style={styles.label}>Download (KB/s)</Text>
+          <Text style={styles.label}>下载 (KB/s)</Text>
           <Controller
             name="alt_dl_limit"
             control={control}
@@ -979,7 +979,7 @@ function QBitConfigForm({ server }: { server: Server }) {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Upload (KB/s)</Text>
+          <Text style={styles.label}>上传 (KB/s)</Text>
           <Controller
             name="alt_up_limit"
             control={control}
@@ -1001,8 +1001,8 @@ function QBitConfigForm({ server }: { server: Server }) {
               <SettingsToggle
                 value={field.value}
                 onPress={field.onChange}
-                label="Schedule alt speed limits"
-                description="Apply alternate speed limits on a schedule."
+                label="定时启用备用速度限制"
+                description="按计划应用备用速度限制。"
               />
             )}
           />
@@ -1011,7 +1011,7 @@ function QBitConfigForm({ server }: { server: Server }) {
         {watch("scheduler_enabled") && (
           <>
             <View style={styles.row}>
-              <Text style={styles.label}>From</Text>
+              <Text style={styles.label}>从</Text>
               <SettingsInlineGroup>
                 <Controller
                   name="schedule_from_hour"
@@ -1044,7 +1044,7 @@ function QBitConfigForm({ server }: { server: Server }) {
             </View>
 
             <View style={styles.row}>
-              <Text style={styles.label}>To</Text>
+              <Text style={styles.label}>到</Text>
               <SettingsInlineGroup>
                 <Controller
                   name="schedule_to_hour"
@@ -1077,13 +1077,13 @@ function QBitConfigForm({ server }: { server: Server }) {
             </View>
 
             <View style={styles.row}>
-              <Text style={styles.label}>Days</Text>
+              <Text style={styles.label}>日期</Text>
               <Controller
                 name="scheduler_days"
                 control={control}
                 render={({ field }) => (
                   <SettingsSelectInput
-                    title="Days"
+                    title="日期"
                     value={field.value}
                     options={schedulerDaysOptions}
                     onChange={field.onChange}
@@ -1094,7 +1094,7 @@ function QBitConfigForm({ server }: { server: Server }) {
           </>
         )}
 
-        <SettingsSectionTitle title="Seed" />
+        <SettingsSectionTitle title="做种" />
 
         <View style={styles.row}>
           <Controller
@@ -1102,7 +1102,7 @@ function QBitConfigForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="When ratio reaches"
+                label="当分享率达到"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -1128,7 +1128,7 @@ function QBitConfigForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="When total seeding time reaches (min)"
+                label="当总做种时间达到（分钟）"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -1154,7 +1154,7 @@ function QBitConfigForm({ server }: { server: Server }) {
             control={control}
             render={({ field }) => (
               <SettingsToggleFieldLabel
-                label="When inactive seeding time reaches (min)"
+                label="当空闲做种时间达到（分钟）"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -1176,13 +1176,13 @@ function QBitConfigForm({ server }: { server: Server }) {
 
         {anySeedLimitEnabled && (
           <View style={styles.row}>
-            <Text style={styles.label}>Then</Text>
+            <Text style={styles.label}>然后</Text>
             <Controller
               name="max_ratio_act"
               control={control}
               render={({ field }) => (
                 <SettingsSelectInput
-                  title="Seeding action"
+                  title="做种动作"
                   value={field.value}
                   options={seedingActionOptions}
                   onChange={field.onChange}
@@ -1192,7 +1192,7 @@ function QBitConfigForm({ server }: { server: Server }) {
           </View>
         )}
 
-        <SettingsSectionTitle title="Queue" />
+        <SettingsSectionTitle title="队列" />
 
         <View style={styles.row}>
           <Controller
@@ -1202,15 +1202,15 @@ function QBitConfigForm({ server }: { server: Server }) {
               <SettingsToggle
                 value={field.value}
                 onPress={field.onChange}
-                label="Enable queueing"
-                description="Use queue limits for active torrents."
+                label="启用队列"
+                description="对活动种子使用队列限制。"
               />
             )}
           />
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Max active downloads</Text>
+          <Text style={styles.label}>最大活动下载数</Text>
           <Controller
             name="max_active_downloads"
             control={control}
@@ -1226,7 +1226,7 @@ function QBitConfigForm({ server }: { server: Server }) {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Max active uploads</Text>
+          <Text style={styles.label}>最大活动上传数</Text>
           <Controller
             name="max_active_uploads"
             control={control}
@@ -1242,7 +1242,7 @@ function QBitConfigForm({ server }: { server: Server }) {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Max active torrents</Text>
+          <Text style={styles.label}>最大活动种子数</Text>
           <Controller
             name="max_active_torrents"
             control={control}
@@ -1257,7 +1257,7 @@ function QBitConfigForm({ server }: { server: Server }) {
           />
         </View>
 
-        <SettingsSectionTitle title="Peer discovery" />
+        <SettingsSectionTitle title="Peer 发现" />
 
         <View style={[styles.row, { gap: 16 }]}>
           <Controller
@@ -1267,8 +1267,8 @@ function QBitConfigForm({ server }: { server: Server }) {
               <SettingsToggle
                 value={field.value}
                 onPress={field.onChange}
-                label="Enable Distributed Hash Table"
-                description="Find peers from the distributed network."
+                label="启用 DHT"
+                description="从分布式网络查找 Peer。"
               />
             )}
           />
@@ -1279,8 +1279,8 @@ function QBitConfigForm({ server }: { server: Server }) {
               <SettingsToggle
                 value={field.value}
                 onPress={field.onChange}
-                label="Enable Peer Exchange"
-                description="Exchange peer lists with connected peers."
+                label="启用 Peer 交换"
+                description="与已连接 Peer 交换 Peer 列表。"
               />
             )}
           />
@@ -1291,21 +1291,21 @@ function QBitConfigForm({ server }: { server: Server }) {
               <SettingsToggle
                 value={field.value}
                 onPress={field.onChange}
-                label="Enable Local Peer Discovery"
-                description="Find peers on your local network."
+                label="启用本地 Peer 发现"
+                description="在本地网络中查找 Peer。"
               />
             )}
           />
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Encryption</Text>
+          <Text style={styles.label}>加密</Text>
           <Controller
             name="encryption"
             control={control}
             render={({ field }) => (
               <SettingsSelectInput
-                title="Encryption"
+                title="加密"
                 value={field.value}
                 options={encryptionOptions}
                 onChange={field.onChange}
@@ -1342,7 +1342,7 @@ export default function ServerConfigurationScreen() {
 
     SheetManager.show(SELECT_SHEET_ID, {
       payload: {
-        title: "Select server",
+        title: "选择服务器",
         options,
         onSelect: (value) => setSelectedId(String(value)),
       },
@@ -1352,7 +1352,7 @@ export default function ServerConfigurationScreen() {
   if (servers.length === 0) {
     return (
       <Screen>
-        <Text>No servers configured</Text>
+        <Text>尚未配置服务器</Text>
       </Screen>
     );
   }
@@ -1362,7 +1362,7 @@ export default function ServerConfigurationScreen() {
       {servers.length > 1 && (
         <Pressable style={styles.serverSelector} onPress={onPickServer}>
           <Feather name="server" size={16} color={text} />
-          <Text style={styles.serverName}>{server?.name ?? "Select server"}</Text>
+          <Text style={styles.serverName}>{server?.name ?? "选择服务器"}</Text>
           <Feather name="chevron-down" size={16} color={text} />
         </Pressable>
       )}

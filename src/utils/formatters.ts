@@ -8,7 +8,7 @@ function formatBytes(units: string[]): (bytes: number) => string {
         return `${(bytes / Math.pow(step, i + 1)).toFixed(2)} ${units[i]}`;
       }
     }
-    return `infinite`;
+    return `无限`;
   };
 }
 
@@ -26,33 +26,33 @@ export const formatETA = (eta: number): string => {
   const seconds = eta % 60;
 
   if (days > 7) {
-    return `${days}d`;
+    return `${days} 天`;
   } else if (days > 0) {
-    return `${days}d ${hours}h`;
+    return `${days} 天 ${hours} 小时`;
   } else if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    return `${hours} 小时 ${minutes} 分钟`;
   } else if (minutes > 0) {
-    return `${minutes}m ${seconds}s`;
+    return `${minutes} 分钟 ${seconds} 秒`;
   }
 
-  return `${seconds}s`;
+  return `${seconds} 秒`;
 };
 
 export const formatStatus = (status: TorrentStatus): string => {
   switch (status) {
     case TorrentStatus.STOPPED:
-      return "stopped";
+      return "已停止";
     case TorrentStatus.QUEUED_TO_VERIFY_LOCAL_DATA:
-      return "queued to verify local data";
+      return "排队校验本地数据";
     case TorrentStatus.VERIFYING_LOCAL_DATA:
-      return "verifying local data";
+      return "正在校验本地数据";
     case TorrentStatus.QUEUED_TO_DOWNLOAD:
-      return "queued to download";
+      return "排队下载";
     case TorrentStatus.DOWNLOADING:
-      return "downloading";
+      return "下载中";
     case TorrentStatus.QUEUED_TO_SEED:
-      return "queued to seed";
+      return "排队做种";
     case TorrentStatus.SEEDING:
-      return "seeding";
+      return "做种中";
   }
 };

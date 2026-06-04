@@ -39,27 +39,27 @@ function TorrentActionsSheet({
 
   let options: OptionProps[] = [
     {
-      label: "Start",
+      label: "开始",
       left: "play",
       onPress: () => actions.start.mutate({ ids }),
     },
     {
-      label: "Start now",
+      label: "立即开始",
       left: "play",
       onPress: () => actions.startNow.mutate({ ids }),
     },
     {
-      label: "Stop",
+      label: "停止",
       left: "pause",
       onPress: () => actions.stop.mutate({ ids }),
     },
     {
-      label: "Verify",
+      label: "校验",
       left: "check-circle",
       onPress: () => actions.verify.mutate({ ids }),
     },
     {
-      label: "Reannounce",
+      label: "重新通告",
       left: "radio",
       onPress: () => actions.reannounce.mutate({ ids }),
     },
@@ -69,7 +69,7 @@ function TorrentActionsSheet({
       ? []
       : [
           {
-            label: "Move",
+            label: "移动",
             left: "folder" as const,
             onPress: () => {
               const downloadDir =
@@ -104,7 +104,7 @@ function TorrentActionsSheet({
   ) {
     const [{ id }] = torrents;
     options.push({
-      label: "Export to Downloads",
+      label: "导出到下载目录",
       left: "download",
       onPress: () => exportToDownloads.mutate({ infoHash: String(id) }),
     });
@@ -114,7 +114,7 @@ function TorrentActionsSheet({
     const [{ id, name, magnetLink }] = torrents;
     options = [
       {
-        label: "Share",
+        label: "分享",
         left: "share",
         onPress: async () => {
           try {
@@ -122,11 +122,11 @@ function TorrentActionsSheet({
               {
                 message: magnetLink,
               },
-              { dialogTitle: `Share ${name}` }
+              { dialogTitle: `分享 ${name}` }
             );
           } catch {
             ToastAndroid.show(
-              "Failed to share magnet link",
+              "分享 Magnet 链接失败",
               ToastAndroid.SHORT
             );
           }
@@ -138,7 +138,7 @@ function TorrentActionsSheet({
         ? []
         : [
             {
-              label: "Rename",
+              label: "重命名",
               left: "edit-2" as const,
               onPress: () => {
                 setTimeout(
@@ -164,7 +164,7 @@ function TorrentActionsSheet({
     const [{ id }] = torrents;
     options = [
       {
-        label: "Details",
+        label: "详情",
         left: "info",
         onPress: () => {
           router.push(`/info/${id}`);
@@ -172,7 +172,7 @@ function TorrentActionsSheet({
         },
       },
       {
-        label: "Settings",
+        label: "设置",
         left: "settings",
         onPress: () => {
           router.push(`/info/${id}/settings`);
@@ -187,7 +187,7 @@ function TorrentActionsSheet({
     options = [
       ...options,
       {
-        label: "Remove",
+        label: "移除",
         left: "trash-2",
         color: red,
         onPress: () => {
@@ -203,7 +203,7 @@ function TorrentActionsSheet({
     ];
   }
 
-  return <ActionSheet title="Action" options={options} {...props} />;
+  return <ActionSheet title="操作" options={options} {...props} />;
 }
 
 TorrentActionsSheet.sheetId = TORRENT_ACTIONS_SHEET_ID;

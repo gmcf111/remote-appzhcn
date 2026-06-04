@@ -8,7 +8,7 @@ import type { Server } from "~/store/servers";
 
 export const LOCAL_SERVER_ID = "local" as const;
 
-const UNAVAILABLE = "Local service is not available in this build.";
+const UNAVAILABLE = "此构建不包含本地服务。";
 
 function reject(): never {
   throw new Error(UNAVAILABLE);

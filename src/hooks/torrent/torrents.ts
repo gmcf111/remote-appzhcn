@@ -211,7 +211,7 @@ function useAction(
     },
     onError: (_error, _params, context) => {
       queryClient.setQueryData(queryKeys.torrentGet(server), context?.previous);
-      ToastAndroid.show("Failed to perform action", ToastAndroid.SHORT);
+      ToastAndroid.show("操作失败", ToastAndroid.SHORT);
     },
     onSuccess: () => {
       if (successToast) ToastAndroid.show(successToast, ToastAndroid.SHORT);
@@ -275,13 +275,13 @@ export function useTorrentActions() {
       old?.map((t) =>
         ids.includes(t.id) ? { ...t, status: getOptimisticStatus("verify", t) } : t,
       ),
-    "Verifying…",
+    "正在校验…",
   );
 
   const reannounce = useAction(
     (c) => (p) => c.reannounceTorrents(p.ids),
     undefined,
-    "Reannounced to trackers",
+    "已重新向 Tracker 通告",
   );
 
   const remove = useAction(
@@ -302,7 +302,7 @@ export function useRenamePath() {
       await client?.renamePath(params);
     },
     onError: () => {
-      ToastAndroid.show("Failed to rename", ToastAndroid.SHORT);
+      ToastAndroid.show("重命名失败", ToastAndroid.SHORT);
     },
     onSettled: () => {
       setTimeout(
@@ -324,7 +324,7 @@ export function useTorrentSetLocation() {
       await client?.setLocation(params);
     },
     onError: () => {
-      ToastAndroid.show("Failed to move torrent", ToastAndroid.SHORT);
+      ToastAndroid.show("移动种子失败", ToastAndroid.SHORT);
     },
     onSettled: () => {
       clear();
@@ -397,7 +397,7 @@ export function useTorrentSet(id: TorrentId) {
     onError: (_error, _params, context) => {
       const key = queryKeys.torrentFiles(server, id);
       queryClient.setQueryData(key, context?.previous);
-      ToastAndroid.show("Failed to perform action", ToastAndroid.SHORT);
+      ToastAndroid.show("操作失败", ToastAndroid.SHORT);
     },
     onSettled: () => {
       setTimeout(

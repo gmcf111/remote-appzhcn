@@ -30,42 +30,42 @@ const Form = z
 
     honorsSessionLimits: z.boolean().optional(),
     downloadLimited: z.boolean(),
-    downloadLimit: z.coerce.number({ message: "expected a number" }),
+    downloadLimit: z.coerce.number({ message: "请输入数字" }),
     uploadLimited: z.boolean(),
-    uploadLimit: z.coerce.number({ message: "expected a number" }),
+    uploadLimit: z.coerce.number({ message: "请输入数字" }),
 
     seedIdleMode: z.number(),
-    seedIdleLimit: z.coerce.number({ message: "expected a number" }),
+    seedIdleLimit: z.coerce.number({ message: "请输入数字" }),
     seedRatioMode: z.number(),
-    seedRatioLimit: z.coerce.number({ message: "expected a number" }),
+    seedRatioLimit: z.coerce.number({ message: "请输入数字" }),
   })
   .superRefine((data, ctx) => {
     if (data["downloadLimited"] && !data["downloadLimit"]) {
       ctx.addIssue({
         path: ["downloadLimit"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
     if (data["uploadLimited"] && !data["uploadLimit"]) {
       ctx.addIssue({
         path: ["uploadLimit"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
     if (data["seedRatioMode"] === Mode.SINGLE && !data["seedRatioLimit"]) {
       ctx.addIssue({
         path: ["seedRatioLimit"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
     if (data["seedIdleMode"] === Mode.SINGLE && !data["seedIdleLimit"]) {
       ctx.addIssue({
         path: ["seedIdleLimit"],
         code: z.ZodIssueCode.custom,
-        message: "field is required",
+        message: "此字段必填",
       });
     }
   });
@@ -104,12 +104,12 @@ export default function TorrentSettingsScreen() {
         mutate(params, {
           onSuccess: () => {
             ToastAndroid.show(
-              "Torrent settings updated successfully",
+              "种子设置已更新",
               ToastAndroid.SHORT
             );
           },
           onError: () => {
-            ToastAndroid.show("Failed to update server", ToastAndroid.SHORT);
+            ToastAndroid.show("更新服务器失败", ToastAndroid.SHORT);
           },
         });
       },
@@ -146,11 +146,11 @@ export default function TorrentSettingsScreen() {
         contentInset={{ bottom: inset.bottom }}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsSectionTitle title="Bandwidth" first />
+        <SettingsSectionTitle title="带宽" first />
 
         {isTransmission && (
           <>
-            <SettingsFieldRow label="Transfer priority">
+            <SettingsFieldRow label="传输优先级">
               <Controller
                 name="bandwidthPriority"
                 control={control}
@@ -161,22 +161,22 @@ export default function TorrentSettingsScreen() {
                     onChange={field.onChange}
                     options={[
                       {
-                        label: "High",
+                        label: "高",
                         left: "chevrons-up" as const,
                         value: Priority.HIGH,
                       },
                       {
-                        label: "Normal",
+                        label: "普通",
                         left: "minus" as const,
                         value: Priority.NORMAL,
                       },
                       {
-                        label: "Low",
+                        label: "低",
                         left: "chevrons-down" as const,
                         value: Priority.LOW,
                       },
                     ]}
-                    title="Transfer Priority"
+                    title="传输优先级"
                   />
                 )}
               />
@@ -191,8 +191,8 @@ export default function TorrentSettingsScreen() {
                     variant="settings"
                     value={field.value ?? true}
                     onPress={field.onChange}
-                    label="Honor session limits"
-                    description="Use server-wide speed limits for this torrent."
+                    label="遵循会话限制"
+                    description="此种子使用服务器全局速度限制。"
                   />
                 )}
               />
@@ -211,7 +211,7 @@ export default function TorrentSettingsScreen() {
                     variant="settings"
                     value={field.value}
                     onPress={field.onChange}
-                    label="Enable download limit"
+                    label="启用下载限制"
                   />
                 )}
               />
@@ -222,7 +222,7 @@ export default function TorrentSettingsScreen() {
               control={control}
               render={({ field, fieldState }) => (
                 <SettingsFieldRow
-                  label="Download limit (KB/s)"
+                  label="下载限制 (KB/s)"
                   error={fieldState.error?.message}
                   reserveErrorSpace
                 >
@@ -247,7 +247,7 @@ export default function TorrentSettingsScreen() {
                     variant="settings"
                     value={field.value}
                     onPress={field.onChange}
-                    label="Enable upload limit"
+                    label="启用上传限制"
                   />
                 )}
               />
@@ -258,7 +258,7 @@ export default function TorrentSettingsScreen() {
               control={control}
               render={({ field, fieldState }) => (
                 <SettingsFieldRow
-                  label="Upload limit (KB/s)"
+                  label="上传限制 (KB/s)"
                   error={fieldState.error?.message}
                   reserveErrorSpace
                 >
@@ -281,7 +281,7 @@ export default function TorrentSettingsScreen() {
               control={control}
               render={({ field, fieldState }) => (
                 <SettingsFieldRow
-                  label="Download limit (KB/s, 0 = unlimited)"
+                  label="下载限制 (KB/s，0 表示不限速)"
                   error={fieldState.error?.message}
                   reserveErrorSpace
                 >
@@ -301,7 +301,7 @@ export default function TorrentSettingsScreen() {
               control={control}
               render={({ field, fieldState }) => (
                 <SettingsFieldRow
-                  label="Upload limit (KB/s, 0 = unlimited)"
+                  label="上传限制 (KB/s，0 表示不限速)"
                   error={fieldState.error?.message}
                   reserveErrorSpace
                 >
@@ -318,9 +318,9 @@ export default function TorrentSettingsScreen() {
           </>
         )}
 
-        <SettingsSectionTitle title="Seed" />
+        <SettingsSectionTitle title="做种" />
 
-        <SettingsFieldRow label="Stop seeding at ratio">
+        <SettingsFieldRow label="达到分享率后停止做种">
           <Controller
             name="seedRatioMode"
             control={control}
@@ -331,22 +331,22 @@ export default function TorrentSettingsScreen() {
                 onChange={field.onChange}
                 options={[
                   {
-                    label: "Global settings",
+                    label: "全局设置",
                     left: "globe" as const,
                     value: Mode.GLOBAL,
                   },
                   {
-                    label: "Stop at ratio",
+                    label: "按分享率停止",
                     left: "sliders" as const,
                     value: Mode.SINGLE,
                   },
                   {
-                    label: "Unlimited",
+                    label: "不限",
                     left: "zap" as const,
                     value: Mode.UNLIMITED,
                   },
                 ]}
-                title="Ratio Limit Mode"
+                title="分享率限制模式"
               />
             )}
           />
@@ -357,7 +357,7 @@ export default function TorrentSettingsScreen() {
           control={control}
           render={({ field, fieldState }) => (
             <SettingsFieldRow
-              label="Ratio limit"
+              label="分享率限制"
               error={fieldState.error?.message}
               reserveErrorSpace
             >
@@ -373,7 +373,7 @@ export default function TorrentSettingsScreen() {
           )}
         />
 
-        <SettingsFieldRow label="Stop seeding if idle">
+        <SettingsFieldRow label="空闲时停止做种">
           <Controller
             name="seedIdleMode"
             control={control}
@@ -384,22 +384,22 @@ export default function TorrentSettingsScreen() {
                 onChange={field.onChange}
                 options={[
                   {
-                    label: "Global settings",
+                    label: "全局设置",
                     left: "globe" as const,
                     value: Mode.GLOBAL,
                   },
                   {
-                    label: "Stop when inactive",
+                    label: "无活动时停止",
                     left: "sliders" as const,
                     value: Mode.SINGLE,
                   },
                   {
-                    label: "Unlimited",
+                    label: "不限",
                     left: "zap" as const,
                     value: Mode.UNLIMITED,
                   },
                 ]}
-                title="Idle Mode"
+                title="空闲模式"
               />
             )}
           />
@@ -410,7 +410,7 @@ export default function TorrentSettingsScreen() {
           control={control}
           render={({ field, fieldState }) => (
             <SettingsFieldRow
-              label="Idle seeding limit (minutes)"
+              label="空闲做种限制（分钟）"
               error={fieldState.error?.message}
               reserveErrorSpace
             >

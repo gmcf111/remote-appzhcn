@@ -1,21 +1,21 @@
-# Transmission's RPC specification
-This document describes a protocol for interacting with Transmission sessions remotely.
+# Transmission 的 RPC 规范
+本文档描述了用于远程与 Transmission 会话交互的协议。
 
-### 1.1 Terminology
-The [JSON](https://www.json.org/) terminology in [RFC 4627](https://datatracker.ietf.org/doc/html/rfc4627) is used.
-RPC requests and responses are formatted in JSON.
+### 1.1 术语
+使用 [RFC 4627](https://datatracker.ietf.org/doc/html/rfc4627) 中的 [JSON](https://www.json.org/) 术语。
+RPC 请求和响应均以 JSON 格式表示。
 
-### 1.2 Tools
-If `transmission-remote` is called with a `--debug` argument, its RPC traffic to the Transmission server will be dumped to the terminal. This can be useful when you want to compare requests in your application to another for reference.
+### 1.2 工具
+如果调用 `transmission-remote` 时带有 `--debug` 参数，它与 Transmission 服务器之间的 RPC 流量会被转储到终端。当你想将应用中的请求与另一个请求进行对照时，这会很有用。
 
-If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, it too will dump the RPC requests and responses to the terminal for inspection.
+如果运行 `transmission-qt` 时设置了环境变量 `TR_RPC_VERBOSE`，它也会将 RPC 请求和响应转储到终端以供检查。
 
-Lastly, using the browser's developer tools in the Transmission web client is always an option.
+最后，使用 Transmission Web 客户端中的浏览器开发者工具始终也是一种选择。
 
-### 1.3 Libraries of ready-made wrappers
-Some people outside of the Transmission project have written libraries that wrap this RPC API. These aren't supported by the Transmission project, but are listed here in the hope that they may be useful:
+### 1.3 现成封装库
+Transmission 项目之外的一些人编写了封装此 RPC API 的库。这些库不受 Transmission 项目支持，但列在这里，希望它们可能有用：
 
-| Language | Link
+| 语言 | 链接
 |:---|:---
 | C# | https://www.nuget.org/packages/Transmission.API.RPC
 | Go | https://github.com/hekmon/transmissionrpc
@@ -23,17 +23,17 @@ Some people outside of the Transmission project have written libraries that wrap
 | Rust | https://crates.io/crates/transmission-rpc
 
 
-## 2 Message format
-Messages are formatted as objects. There are two types: requests (described in [section 2.1](#21-requests)) and responses (described in [section 2.2](#22-responses)).
+## 2 消息格式
+消息以对象形式表示。有两种类型：请求（见[第 2.1 节](#21-requests)）和响应（见[第 2.2 节](#22-responses)）。
 
-All text **must** be UTF-8 encoded.
+所有文本**必须**使用 UTF-8 编码。
 
-### 2.1 Requests
-Requests support three keys:
+### 2.1 请求
+请求支持三个键：
 
-1. A required `method` string telling the name of the method to invoke
-2. An optional `arguments` object of key/value pairs. The keys allowed are defined by the `method`.
-3. An optional `tag` number used by clients to track responses. If provided by a request, the response MUST include the same tag.
+1. 必需的 `method` 字符串，表示要调用的方法名称
+2. 可选的 `arguments` 对象，由 key/value 对组成。允许的键由 `method` 定义。
+3. 可选的 `tag` 数字，供客户端跟踪响应。如果请求提供了该值，响应 MUST 包含相同的 tag。
 
 ```json
 {
@@ -48,12 +48,12 @@ Requests support three keys:
 ```
 
 
-### 2.2 Responses
-Responses to a request will include:
+### 2.2 响应
+对请求的响应将包含：
 
-1. A required `result` string whose value MUST be `success` on success, or an error string on failure.
-2. An optional `arguments` object of key/value pairs. Its keys contents are defined by the `method` and `arguments` of the original request.
-3. An optional `tag` number as described in 2.1.
+1. 必需的 `result` 字符串，成功时其值 MUST 为 `success`，失败时为错误字符串。
+2. 可选的 `arguments` 对象，由 key/value 对组成。其键内容由原始请求的 `method` 和 `arguments` 定义。
+3. 可选的 `tag` 数字，如 2.1 所述。
 
 ```json
 {
@@ -65,154 +65,115 @@ Responses to a request will include:
 }
 ```
 
-### 2.3 Transport mechanism
-HTTP POSTing a JSON-encoded request is the preferred way of communicating
-with a Transmission RPC server. The current Transmission implementation
-has the default URL as `http://host:9091/transmission/rpc`. Clients
-may use this as a default, but should allow the URL to be reconfigured,
-since the port and path may be changed to allow mapping and/or multiple
-daemons to run on a single server.
+### 2.3 传输机制
+通过 HTTP POST 发送 JSON 编码的请求，是与 Transmission RPC 服务器通信的首选方式。当前 Transmission 实现的默认 URL 为 `http://host:9091/transmission/rpc`。客户端可以将其用作默认值，但应允许重新配置 URL，因为端口和路径可能会被更改，以支持映射和/或在单个服务器上运行多个守护进程。
 
-#### 2.3.1 CSRF protection
-Most Transmission RPC servers require a `X-Transmission-Session-Id`
-header to be sent with requests, to prevent CSRF attacks.
+#### 2.3.1 CSRF 保护
+大多数 Transmission RPC 服务器要求请求携带 `X-Transmission-Session-Id` header，以防止 CSRF 攻击。
 
-When your request has the wrong id -- such as when you send your first
-request, or when the server expires the CSRF token -- the
-Transmission RPC server will return an HTTP 409 error with the
-right `X-Transmission-Session-Id` in its own headers.
+当你的请求 id 错误时——例如发送第一个请求时，或服务器使 CSRF token 过期时——Transmission RPC 服务器会返回 HTTP 409 错误，并在自己的 headers 中带上正确的 `X-Transmission-Session-Id`。
 
-So, the correct way to handle a 409 response is to update your
-`X-Transmission-Session-Id` and to resend the previous request.
+因此，处理 409 响应的正确方式是更新你的 `X-Transmission-Session-Id`，并重新发送前一个请求。
 
-#### 2.3.2 DNS rebinding protection
-Additional check is being made on each RPC request to make sure that the
-client sending the request does so using one of the allowed hostnames by
-which RPC server is meant to be available.
+#### 2.3.2 DNS rebinding 保护
+每个 RPC 请求都会进行额外检查，以确保发送请求的客户端使用的是 RPC 服务器预期可用的允许主机名之一。
 
-If host whitelisting is enabled (which is true by default), Transmission
-inspects the `Host:` HTTP header value (with port stripped, if any) and
-matches it to one of the whitelisted names. Regardless of host whitelist
-content, `localhost` and `localhost.` domain names as well as all the IP
-addresses are always implicitly allowed.
+如果启用了主机白名单（默认即为 true），Transmission 会检查 `Host:` HTTP header 的值（如有端口则去除端口），并将其与白名单名称之一匹配。无论主机白名单内容如何，`localhost` 和 `localhost.` 域名以及所有 IP 地址始终会被隐式允许。
 
-For more information on configuration, see settings.json documentation for
-`rpc-host-whitelist-enabled` and `rpc-host-whitelist` keys.
+有关配置的更多信息，请参阅 settings.json 文档中的 `rpc-host-whitelist-enabled` 和 `rpc-host-whitelist` 键。
 
-#### 2.3.3 Authentication
-Enabling authentication is an optional security feature that can be enabled
-on Transmission RPC servers. Authentication occurs by method of HTTP Basic
-Access Authentication.
+#### 2.3.3 身份验证
+启用身份验证是一项可在 Transmission RPC 服务器上启用的可选安全功能。身份验证通过 HTTP Basic Access Authentication 完成。
 
-If authentication is enabled, Transmission inspects the `Authorization:`
-HTTP header value to validate the credentials of the request. The value
-of this HTTP header is expected to be [`Basic <b64 credentials>`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization#basic),
-where <b64 credentials> is equal to a base64 encoded string of the
-username and password (respectively), separated by a colon.
+如果启用了身份验证，Transmission 会检查 `Authorization:` HTTP header 的值以验证请求凭据。该 HTTP header 的值应为 [`Basic <b64 credentials>`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization#basic)，其中 <b64 credentials> 等于由用户名和密码（按此顺序）以冒号分隔后进行 base64 编码得到的字符串。
 
-## 3 Torrent requests
-### 3.1 Torrent action requests
-| Method name          | libtransmission function | Description
+## 3 Torrent 请求
+### 3.1 Torrent 操作请求
+| 方法名称          | libtransmission 函数 | 说明
 |:--|:--|:--
-| `torrent-start`      | tr_torrentStart          | start torrent
-| `torrent-start-now`  | tr_torrentStartNow       | start torrent disregarding queue position
-| `torrent-stop`       | tr_torrentStop           | stop torrent
-| `torrent-verify`     | tr_torrentVerify         | verify torrent
-| `torrent-reannounce` | tr_torrentManualUpdate   | re-announce to trackers now
+| `torrent-start`      | tr_torrentStart          | 启动 torrent
+| `torrent-start-now`  | tr_torrentStartNow       | 忽略队列位置并启动 torrent
+| `torrent-stop`       | tr_torrentStop           | 停止 torrent
+| `torrent-verify`     | tr_torrentVerify         | 校验 torrent
+| `torrent-reannounce` | tr_torrentManualUpdate   | 立即重新向 tracker 宣告
 
-Request arguments: `ids`, which specifies which torrents to use.
-All torrents are used if the `ids` argument is omitted.
+请求参数：`ids`，指定要使用哪些 torrent。
+如果省略 `ids` 参数，则使用所有 torrent。
 
-`ids` should be one of the following:
+`ids` 应为以下之一：
 
-1. an integer referring to a torrent id
-2. a list of torrent id numbers, SHA1 hash strings, or both
-3. a string, `recently-active`, for recently-active torrents
+1. 表示 torrent id 的整数
+2. torrent id 数字、SHA1 hash 字符串或二者混合组成的列表
+3. 字符串 `recently-active`，表示最近活跃的 torrent
 
-Note that integer torrent ids are not stable across Transmission daemon
-restarts. Use torrent hashes if you need stable ids.
+注意，整数 torrent id 在 Transmission daemon 重启后并不稳定。如果需要稳定 id，请使用 torrent hash。
 
-Response arguments: none
+响应参数：无
 
-### 3.2 Torrent mutator: `torrent-set`
-Method name: `torrent-set`
+### 3.2 Torrent 修改器：`torrent-set`
+方法名称：`torrent-set`
 
-Request arguments:
+请求参数：
 
-| Key | Value Type | Value Description
+| 键 | 值类型 | 值说明
 |:--|:--|:--
-| `bandwidthPriority`   | number   | this torrent's bandwidth tr_priority_t
-| `downloadLimit`       | number   | maximum download speed (KBps)
-| `downloadLimited`     | boolean  | true if `downloadLimit` is honored
-| `files-unwanted`      | array    | indices of file(s) to not download
-| `files-wanted`        | array    | indices of file(s) to download
-| `group`               | string   | The name of this torrent's bandwidth group
-| `honorsSessionLimits` | boolean  | true if session upload limits are honored
-| `ids`                 | array    | torrent list, as described in 3.1
-| `labels`              | array    | array of string labels
-| `location`            | string   | new location of the torrent's content
-| `peer-limit`          | number   | maximum number of peers
-| `priority-high`       | array    | indices of high-priority file(s)
-| `priority-low`        | array    | indices of low-priority file(s)
-| `priority-normal`     | array    | indices of normal-priority file(s)
-| `queuePosition`       | number   | position of this torrent in its queue [0...n)
-| `seedIdleLimit`       | number   | torrent-level number of minutes of seeding inactivity
-| `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
-| `seedRatioLimit`      | double   | torrent-level seeding ratio
-| `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
-| `sequential_download` | boolean  | download torrent pieces sequentially
-| `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
-| `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
-| `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
-| `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
-| `uploadLimit`         | number   | maximum upload speed (KBps)
-| `uploadLimited`       | boolean  | true if `uploadLimit` is honored
+| `bandwidthPriority`   | number   | 此 torrent 的带宽 tr_priority_t
+| `downloadLimit`       | number   | 最大下载速度（KBps）
+| `downloadLimited`     | boolean  | 如果遵守 `downloadLimit` 则为 true
+| `files-unwanted`      | array    | 不下载的文件索引
+| `files-wanted`        | array    | 要下载的文件索引
+| `group`               | string   | 此 torrent 的带宽组名称
+| `honorsSessionLimits` | boolean  | 如果遵守 session 上传限制则为 true
+| `ids`                 | array    | torrent 列表，如 3.1 所述
+| `labels`              | array    | 字符串标签数组
+| `location`            | string   | torrent 内容的新位置
+| `peer-limit`          | number   | 最大 peer 数量
+| `priority-high`       | array    | 高优先级文件的索引
+| `priority-low`        | array    | 低优先级文件的索引
+| `priority-normal`     | array    | 普通优先级文件的索引
+| `queuePosition`       | number   | 此 torrent 在其队列中的位置 [0...n)
+| `seedIdleLimit`       | number   | torrent 级别的做种不活跃分钟数
+| `seedIdleMode`        | number   | 使用哪种做种不活跃限制。见 tr_idlelimit
+| `seedRatioLimit`      | double   | torrent 级别的做种比例
+| `seedRatioMode`       | number   | 使用哪种比例。见 tr_ratiolimit
+| `sequential_download` | boolean  | 按顺序下载 torrent 分片
+| `trackerAdd`          | array    | **DEPRECATED** 改用 trackerList
+| `trackerList`         | string   | announce URL 字符串，每行一个，[tiers](https://www.bittorrent.org/beps/bep_0012.html) 之间用空行分隔。
+| `trackerRemove`       | array    | **DEPRECATED** 改用 trackerList
+| `trackerReplace`      | array    | **DEPRECATED** 改用 trackerList
+| `uploadLimit`         | number   | 最大上传速度（KBps）
+| `uploadLimited`       | boolean  | 如果遵守 `uploadLimit` 则为 true
 
-Just as an empty `ids` value is shorthand for "all ids", using an empty array
-for `files-wanted`, `files-unwanted`, `priority-high`, `priority-low`, or
-`priority-normal` is shorthand for saying "all files".
+正如空的 `ids` 值是“所有 ids”的简写，对 `files-wanted`、`files-unwanted`、`priority-high`、`priority-low` 或 `priority-normal` 使用空数组，也是表示“所有文件”的简写。
 
-   Response arguments: none
+   响应参数：无
 
-### 3.3 Torrent accessor: `torrent-get`
-Method name: `torrent-get`.
+### 3.3 Torrent 访问器：`torrent-get`
+方法名称：`torrent-get`。
 
-Request arguments:
+请求参数：
 
-1. An optional `ids` array as described in 3.1.
-2. A required `fields` array of keys. (see list below)
-3. An optional `format` string specifying how to format the
-   `torrents` response field. Allowed values are `objects`
-   (default) and `table`. (see "Response arguments" below)
+1. 可选的 `ids` 数组，如 3.1 所述。
+2. 必需的 `fields` 键数组。（见下方列表）
+3. 可选的 `format` 字符串，指定如何格式化 `torrents` 响应字段。允许值为 `objects`（默认）和 `table`。（见下方“响应参数”）
 
-Response arguments:
+响应参数：
 
-1. A `torrents` array.
+1. 一个 `torrents` 数组。
 
-   If the `format` request was `objects` (default), `torrents` will
-   be an array of objects, each of which contains the key/value
-   pairs matching the request's `fields` arg. This was the only
-   format before Transmission 3 and has some obvious programmer
-   conveniences, such as parsing directly into Javascript objects.
+   如果 `format` 请求为 `objects`（默认），`torrents` 将是一个对象数组，每个对象包含与请求的 `fields` 参数匹配的 key/value 对。这是 Transmission 3 之前唯一的格式，并且具有一些明显的程序员便利性，例如可直接解析为 Javascript 对象。
 
-   If the format was `table`, then `torrents` will be an array of
-   arrays. The first row holds the keys and each remaining row holds
-   a torrent's values for those keys. This format is more efficient
-   in terms of JSON generation and JSON parsing.
+   如果格式为 `table`，则 `torrents` 将是一个数组的数组。第一行保存键，其余每一行保存一个 torrent 对应这些键的值。此格式在 JSON 生成和 JSON 解析方面更高效。
 
-2. If the request's `ids` field was `recently-active`,
-   a `removed` array of torrent-id numbers of recently-removed
-   torrents.
+2. 如果请求的 `ids` 字段为 `recently-active`，则包含最近移除 torrent 的 torrent-id 数字数组 `removed`。
 
-Note: For more information on what these fields mean, see the comments
-in [libtransmission/transmission.h](../libtransmission/transmission.h).
-The 'source' column here corresponds to the data structure there.
+注意：有关这些字段含义的更多信息，请参阅 [libtransmission/transmission.h](../libtransmission/transmission.h) 中的注释。这里的 'source' 列对应那里的数据结构。
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
 | `activityDate` | number | tr_stat
 | `addedDate` | number | tr_stat
-| `availability` | array (see below)| tr_torrentAvailability()
+| `availability` | array（见下文）| tr_torrentAvailability()
 | `bandwidthPriority` | number | tr_priority_t
 | `comment` | string | tr_torrent_view
 | `corruptEver`| number | tr_stat
@@ -230,8 +191,8 @@ The 'source' column here corresponds to the data structure there.
 | `eta` | number | tr_stat
 | `etaIdle` | number | tr_stat
 | `file-count` | number | tr_info
-| `files`| array (see below)| n/a
-| `fileStats`| array (see below)| n/a
+| `files`| array（见下文）| n/a
+| `fileStats`| array（见下文）| n/a
 | `group`| string| n/a
 | `hashString`| string| tr_torrent_view
 | `haveUnchecked`| number| tr_stat
@@ -241,7 +202,7 @@ The 'source' column here corresponds to the data structure there.
 | `isFinished` | boolean| tr_stat
 | `isPrivate` | boolean| tr_torrent
 | `isStalled` | boolean| tr_stat
-| `labels` | array of strings | tr_torrent
+| `labels` | 字符串数组 | tr_torrent
 | `leftUntilDone` | number| tr_stat
 | `magnetLink` | string| n/a
 | `manualAnnounceTime` | number| tr_stat
@@ -249,17 +210,17 @@ The 'source' column here corresponds to the data structure there.
 | `metadataPercentComplete` | double| tr_stat
 | `name` | string| tr_torrent_view
 | `peer-limit` | number| tr_torrent
-| `peers` | array (see below)| n/a
+| `peers` | array（见下文）| n/a
 | `peersConnected` | number| tr_stat
-| `peersFrom` | object (see below)| n/a
+| `peersFrom` | object（见下文）| n/a
 | `peersGettingFromUs` | number| tr_stat
 | `peersSendingToUs` | number| tr_stat
 | `percentComplete` | double | tr_stat
 | `percentDone` | double | tr_stat
-| `pieces` | string (see below)| tr_torrent
+| `pieces` | string（见下文）| tr_torrent
 | `pieceCount`| number| tr_torrent_view
 | `pieceSize`| number| tr_torrent_view
-| `priorities`| array (see below)| n/a
+| `priorities`| array（见下文）| n/a
 | `primary-mime-type`| string| tr_torrent
 | `queuePosition`| number| tr_stat
 | `rateDownload` (B/s)| number| tr_stat
@@ -274,25 +235,25 @@ The 'source' column here corresponds to the data structure there.
 | `sequential_download`| boolean| tr_torrent
 | `sizeWhenDone`| number| tr_stat
 | `startDate`| number| tr_stat
-| `status`| number (see below)| tr_stat
-| `trackers`| array (see below)| n/a
-| `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
-| `trackerStats`| array (see below)| n/a
+| `status`| number（见下文）| tr_stat
+| `trackers`| array（见下文）| n/a
+| `trackerList` | string | announce URL 字符串，每行一个，tiers 之间用空行分隔
+| `trackerStats`| array（见下文）| n/a
 | `totalSize`| number| tr_torrent_view
 | `torrentFile`| string| tr_info
 | `uploadedEver`| number| tr_stat
 | `uploadLimit`| number| tr_torrent
 | `uploadLimited`| boolean| tr_torrent
 | `uploadRatio`| double| tr_stat
-| `wanted`| array (see below)| n/a
-| `webseeds`| array of strings | tr_tracker_view
+| `wanted`| array（见下文）| n/a
+| `webseeds`| 字符串数组 | tr_tracker_view
 | `webseedsSendingToUs`| number| tr_stat
 
-`availability`: An array of `pieceCount` numbers representing the number of connected peers that have each piece, or -1 if we already have the piece ourselves.
+`availability`：由 `pieceCount` 个数字组成的数组，表示拥有每个分片的已连接 peer 数量；如果我们自己已经拥有该分片，则为 -1。
 
-`files`: array of objects, each containing:
+`files`：对象数组，每个对象包含：
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
 | `length` | number | tr_file_view
@@ -300,19 +261,19 @@ The 'source' column here corresponds to the data structure there.
 | `begin_piece` | number | tr_file_view
 | `end_piece` | number | tr_file_view
 
-Files are returned in the order they are laid out in the torrent. References to "file indices" throughout this specification should be interpreted as the position of the file within this ordering, with the first file bearing index 0.
+文件会按照它们在 torrent 中的排列顺序返回。本规范中所有对“file indices”的引用都应解释为文件在该顺序中的位置，第一个文件的索引为 0。
 
-`fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, in the same order as `files`, each containing:
+`fileStats`：文件的非常量属性。由 `tr_info.filecount` 个对象组成的数组，顺序与 `files` 相同，每个对象包含：
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | boolean | tr_file_view (**Note:** Not to be confused with `torrent-get.wanted`, which is an array of 0/1 instead of boolean)
+| `wanted` | boolean | tr_file_view（**注意：** 不要与 `torrent-get.wanted` 混淆，后者是 0/1 数组而不是 boolean）
 | `priority` | number | tr_file_view
 
-`peers`: an array of objects, each containing:
+`peers`：对象数组，每个对象包含：
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
 | `address`            | string     | tr_peer_stat
 | `clientName`         | string     | tr_peer_stat
@@ -331,9 +292,9 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `rateToClient` (B/s) | number     | tr_peer_stat
 | `rateToPeer` (B/s)   | number     | tr_peer_stat
 
-`peersFrom`: an object containing:
+`peersFrom`：包含以下内容的对象：
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
 | `fromCache`    | number     | tr_stat
 | `fromDht`      | number     | tr_stat
@@ -344,26 +305,26 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `fromTracker`  | number     | tr_stat
 
 
-`pieces`: A bitfield holding pieceCount flags which are set to 'true' if we have the piece matching that position. JSON doesn't allow raw binary data, so this is a base64-encoded string. (Source: tr_torrent)
+`pieces`：保存 pieceCount 个标志的位字段；如果我们拥有与该位置匹配的分片，则对应标志设置为 'true'。JSON 不允许原始二进制数据，因此这是一个 base64 编码字符串。（Source: tr_torrent）
 
-`priorities`: An array of `tr_torrentFileCount()` numbers. Each is the `tr_priority_t` mode for the corresponding file.
+`priorities`：由 `tr_torrentFileCount()` 个数字组成的数组。每个数字都是对应文件的 `tr_priority_t` 模式。
 
-`status`: A number between 0 and 6, where:
+`status`：0 到 6 之间的数字，其中：
 
-| Value | Meaning
+| 值 | 含义
 |:--|:--
-| 0 | Torrent is stopped
-| 1 | Torrent is queued to verify local data
-| 2 | Torrent is verifying local data
-| 3 | Torrent is queued to download
-| 4 | Torrent is downloading
-| 5 | Torrent is queued to seed
-| 6 | Torrent is seeding
+| 0 | Torrent 已停止
+| 1 | Torrent 已排队等待校验本地数据
+| 2 | Torrent 正在校验本地数据
+| 3 | Torrent 已排队等待下载
+| 4 | Torrent 正在下载
+| 5 | Torrent 已排队等待做种
+| 6 | Torrent 正在做种
 
 
-`trackers`: array of objects, each containing:
+`trackers`：对象数组，每个对象包含：
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
 | `announce` | string | tr_tracker_view
 | `id` | number | tr_tracker_view
@@ -371,9 +332,9 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `sitename` | string | tr_tracker_view
 | `tier` | number | tr_tracker_view
 
-`trackerStats`: array of objects, each containing:
+`trackerStats`：对象数组，每个对象包含：
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
 | `announce`                | string     | tr_tracker_view
 | `announceState`           | number     | tr_tracker_view
@@ -404,16 +365,16 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `tier`                    | number     | tr_tracker_view
 
 
-`wanted`: An array of `tr_torrentFileCount()` 0/1, 1 (true) if the corresponding file is to be downloaded. (Source: `tr_file_view`)
+`wanted`：由 `tr_torrentFileCount()` 个 0/1 组成的数组；如果对应文件要被下载，则为 1（true）。（Source: `tr_file_view`）
 
-**Note:** For backwards compatibility, in `4.x.x`, `wanted` is serialized as an array of `0` or `1` that should be treated as booleans.
-This will be fixed in `5.0.0` to return an array of booleans.
+**注意：** 为了向后兼容，在 `4.x.x` 中，`wanted` 会序列化为由 `0` 或 `1` 组成的数组，应将它们视为 boolean。
+这将在 `5.0.0` 中修复为返回 boolean 数组。
 
-Example:
+示例：
 
-Say we want to get the name and total size of torrents #7 and #10.
+假设我们想获取 torrent #7 和 #10 的名称与总大小。
 
-Request:
+请求：
 
 ```json
 {
@@ -426,7 +387,7 @@ Request:
 }
 ```
 
-Response:
+响应：
 
 ```json
 {
@@ -449,167 +410,161 @@ Response:
 }
 ```
 
-### 3.4 Adding a torrent
-Method name: `torrent-add`
+### 3.4 添加 torrent
+方法名称：`torrent-add`
 
-Request arguments:
+请求参数：
 
-| Key | Value Type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `cookies`             | string    | pointer to a string of one or more cookies.
-| `download-dir`        | string    | path to download the torrent to
-| `filename`            | string    | filename or URL of the .torrent file
-| `labels`              | array     | array of string labels
-| `metainfo`            | string    | base64-encoded .torrent content
-| `paused`              | boolean   | if true, don't start the torrent
-| `peer-limit`          | number    | maximum number of peers
-| `bandwidthPriority`   | number    | torrent's bandwidth tr_priority_t
-| `files-wanted`        | array     | indices of file(s) to download
-| `files-unwanted`      | array     | indices of file(s) to not download
-| `priority-high`       | array     | indices of high-priority file(s)
-| `priority-low`        | array     | indices of low-priority file(s)
-| `priority-normal`     | array     | indices of normal-priority file(s)
-| `sequential_download` | boolean   | download torrent pieces sequentially
+| `cookies`             | string    | 指向一个或多个 cookie 字符串的指针。
+| `download-dir`        | string    | 下载 torrent 的路径
+| `filename`            | string    | .torrent 文件的文件名或 URL
+| `labels`              | array     | 字符串标签数组
+| `metainfo`            | string    | base64 编码的 .torrent 内容
+| `paused`              | boolean   | 如果为 true，则不启动 torrent
+| `peer-limit`          | number    | 最大 peer 数量
+| `bandwidthPriority`   | number    | torrent 的带宽 tr_priority_t
+| `files-wanted`        | array     | 要下载的文件索引
+| `files-unwanted`      | array     | 不下载的文件索引
+| `priority-high`       | array     | 高优先级文件的索引
+| `priority-low`        | array     | 低优先级文件的索引
+| `priority-normal`     | array     | 普通优先级文件的索引
+| `sequential_download` | boolean   | 按顺序下载 torrent 分片
 
-Either `filename` **or** `metainfo` **must** be included. All other arguments are optional.
+必须包含 `filename` **或** `metainfo`。所有其他参数都是可选的。
 
-The format of the `cookies` should be `NAME=CONTENTS`, where `NAME` is the cookie name and `CONTENTS` is what the cookie should contain. Set multiple cookies like this: `name1=content1; name2=content2;` etc. See [libcurl documentation](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTCOOKIE) for more information.
+`cookies` 的格式应为 `NAME=CONTENTS`，其中 `NAME` 是 cookie 名称，`CONTENTS` 是 cookie 应包含的内容。像这样设置多个 cookie：`name1=content1; name2=content2;` 等等。有关更多信息，请参阅 [libcurl 文档](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTCOOKIE)。
 
-Response arguments:
+响应参数：
 
-* On success, a `torrent-added` object in the form of one of 3.3's torrent objects with the fields for `id`, `name`, and `hashString`.
+* 成功时，返回一个 `torrent-added` 对象，其形式为 3.3 中 torrent 对象之一，包含 `id`、`name` 和 `hashString` 字段。
 
-* When attempting to add a duplicate torrent, a `torrent-duplicate` object in the same form is returned, but the response's `result` value is still `success`.
+* 尝试添加重复 torrent 时，会返回相同形式的 `torrent-duplicate` 对象，但响应的 `result` 值仍为 `success`。
 
-### 3.5 Removing a torrent
-Method name: `torrent-remove`
+### 3.5 移除 torrent
+方法名称：`torrent-remove`
 
-| Key | Value Type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `ids`               | array   | torrent list, as described in 3.1
-| `delete-local-data` | boolean | delete local data. (default: false)
+| `ids`               | array   | torrent 列表，如 3.1 所述
+| `delete-local-data` | boolean | 删除本地数据。（默认：false）
 
-Response arguments: none
+响应参数：无
 
-### 3.6 Moving a torrent
-Method name: `torrent-set-location`
+### 3.6 移动 torrent
+方法名称：`torrent-set-location`
 
-Request arguments:
+请求参数：
 
-| Key | Value Type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `ids`      | array   | torrent list, as described in 3.1
-| `location` | string  | the new torrent location
-| `move`     | boolean | if true, move from previous location. otherwise, search "location" for files (default: false)
+| `ids`      | array   | torrent 列表，如 3.1 所述
+| `location` | string  | 新的 torrent 位置
+| `move`     | boolean | 如果为 true，则从先前位置移动。否则，在 "location" 中搜索文件（默认：false）
 
-Response arguments: none
+响应参数：无
 
-### 3.7 Renaming a torrent's path
-Method name: `torrent-rename-path`
+### 3.7 重命名 torrent 的路径
+方法名称：`torrent-rename-path`
 
-For more information on the use of this function, see the transmission.h
-documentation of `tr_torrentRenamePath()`. In particular, note that if this
-call succeeds you'll want to update the torrent's `files` and `name` field
-with `torrent-get`.
+有关此函数用法的更多信息，请参阅 transmission.h 中 `tr_torrentRenamePath()` 的文档。尤其要注意，如果此调用成功，你会想要通过 `torrent-get` 更新 torrent 的 `files` 和 `name` 字段。
 
-Request arguments:
+请求参数：
 
-| Key | Value Type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `ids` | array | the torrent list, as described in 3.1 (must only be 1 torrent)
-| `path` | string | the path to the file or folder that will be renamed
-| `name` | string | the file or folder's new name
+| `ids` | array | torrent 列表，如 3.1 所述（必须只有 1 个 torrent）
+| `path` | string | 将被重命名的文件或文件夹路径
+| `name` | string | 文件或文件夹的新名称
 
-Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
+响应参数：`path`、`name` 和 `id`，其中保存 torrent ID 整数
 
-## 4  Session requests
-### 4.1 Session arguments
-| Key | Value Type | Description
+## 4 Session 请求
+### 4.1 Session 参数
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `alt-speed-down` | number | max global download speed (KBps)
-| `alt-speed-enabled` | boolean | true means use the alt speeds
-| `alt-speed-time-begin` | number | when to turn on alt speeds (units: minutes after midnight)
-| `alt-speed-time-day` | number | what day(s) to turn on alt speeds (look at tr_sched_day)
-| `alt-speed-time-enabled` | boolean | true means the scheduled on/off times are used
-| `alt-speed-time-end` | number | when to turn off alt speeds (units: same)
-| `alt-speed-up` | number | max global upload speed (KBps)
-| `blocklist-enabled` | boolean | true means enabled
-| `blocklist-size` | number | number of rules in the blocklist
-| `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
-| `cache-size-mb` | number | maximum size of the disk cache (MB)
-| `config-dir` | string | location of transmission's configuration directory
-| `default-trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
-| `dht-enabled` | boolean | true means allow DHT in public torrents
-| `download-dir` | string | default path to download torrents
-| `download-dir-free-space` | number |  **DEPRECATED** Use the `free-space` method instead.
-| `download-queue-enabled` | boolean | if true, limit how many torrents can be downloaded at once
-| `download-queue-size` | number | max number of torrents to download at once (see download-queue-enabled)
-| `encryption` | string | `required`, `preferred`, `tolerated`
-| `idle-seeding-limit-enabled` | boolean | true if the seeding inactivity limit is honored by default
-| `idle-seeding-limit` | number | torrents we're seeding will be stopped if they're idle for this long
-| `incomplete-dir-enabled` | boolean | true means keep torrents in incomplete-dir until done
-| `incomplete-dir` | string | path for incomplete torrents, when enabled
-| `lpd-enabled` | boolean | true means allow Local Peer Discovery in public torrents
-| `peer-limit-global` | number | maximum global number of peers
-| `peer-limit-per-torrent` | number | maximum global number of peers
-| `peer-port-random-on-start` | boolean | true means pick a random peer port on launch
-| `peer-port` | number | port number
-| `pex-enabled` | boolean | true means allow PEX in public torrents
-| `port-forwarding-enabled` | boolean | true means ask upstream router to forward the configured peer port to transmission using UPnP or NAT-PMP
-| `queue-stalled-enabled` | boolean | whether or not to consider idle torrents as stalled
-| `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
-| `rename-partial-files` | boolean | true means append `.part` to incomplete files
-| `reqq` | number | the number of outstanding block requests a peer is allowed to queue in the client
-| `rpc-version-minimum` | number | the minimum RPC API version supported
-| `rpc-version-semver` | string | the current RPC API version in a [semver](https://semver.org)-compatible string
-| `rpc-version` | number | the current RPC API version
-| `script-torrent-added-enabled` | boolean | whether or not to call the `added` script
-| `script-torrent-added-filename` | string | filename of the script to run
-| `script-torrent-done-enabled` | boolean | whether or not to call the `done` script
-| `script-torrent-done-filename` | string | filename of the script to run
-| `script-torrent-done-seeding-enabled` | boolean | whether or not to call the `seeding-done` script
-| `script-torrent-done-seeding-filename` | string | filename of the script to run
-| `seed-queue-enabled` | boolean | if true, limit how many torrents can be uploaded at once
-| `seed-queue-size` | number | max number of torrents to uploaded at once (see seed-queue-enabled)
-| `seedRatioLimit` | double | the default seed ratio for torrents to use
-| `seedRatioLimited` | boolean | true if seedRatioLimit is honored by default
-| `sequential_download` | boolean | true means sequential download is enabled by default for added torrents
-| `session-id` | string | the current `X-Transmission-Session-Id` value
-| `speed-limit-down-enabled` | boolean | true means enabled
-| `speed-limit-down` | number | max global download speed (KBps)
-| `speed-limit-up-enabled` | boolean | true means enabled
-| `speed-limit-up` | number | max global upload speed (KBps)
-| `start-added-torrents` | boolean | true means added torrents will be started right away
-| `trash-original-torrent-files` | boolean | true means the .torrent file of added torrents will be deleted
-| `units` | object | see below
-| `utp-enabled` | boolean | true means allow UTP
-| `version` | string | long version string `$version ($revision)`
+| `alt-speed-down` | number | 最大全局下载速度（KBps）
+| `alt-speed-enabled` | boolean | true 表示使用 alt speeds
+| `alt-speed-time-begin` | number | 何时开启 alt speeds（单位：午夜后的分钟数）
+| `alt-speed-time-day` | number | 哪些日期开启 alt speeds（参见 tr_sched_day）
+| `alt-speed-time-enabled` | boolean | true 表示使用定时开启/关闭时间
+| `alt-speed-time-end` | number | 何时关闭 alt speeds（单位同上）
+| `alt-speed-up` | number | 最大全局上传速度（KBps）
+| `blocklist-enabled` | boolean | true 表示已启用
+| `blocklist-size` | number | blocklist 中规则数量
+| `blocklist-url` | string | 用于 `blocklist-update` 的 blocklist 位置
+| `cache-size-mb` | number | 磁盘缓存的最大大小（MB）
+| `config-dir` | string | transmission 配置目录的位置
+| `default-trackers` | string | announce URL，每行一个，[tiers](https://www.bittorrent.org/beps/bep_0012.html) 之间用空行分隔。
+| `dht-enabled` | boolean | true 表示允许 public torrent 中的 DHT
+| `download-dir` | string | 下载 torrent 的默认路径
+| `download-dir-free-space` | number |  **DEPRECATED** 改用 `free-space` 方法。
+| `download-queue-enabled` | boolean | 如果为 true，则限制可同时下载的 torrent 数量
+| `download-queue-size` | number | 可同时下载的最大 torrent 数量（见 download-queue-enabled）
+| `encryption` | string | `required`、`preferred`、`tolerated`
+| `idle-seeding-limit-enabled` | boolean | 如果默认遵守做种不活跃限制则为 true
+| `idle-seeding-limit` | number | 我们正在做种的 torrent 若空闲这么长时间则会停止
+| `incomplete-dir-enabled` | boolean | true 表示在完成前将 torrent 保留在 incomplete-dir 中
+| `incomplete-dir` | string | 启用时，未完成 torrent 的路径
+| `lpd-enabled` | boolean | true 表示允许 public torrent 中的 Local Peer Discovery
+| `peer-limit-global` | number | 全局最大 peer 数量
+| `peer-limit-per-torrent` | number | 全局最大 peer 数量
+| `peer-port-random-on-start` | boolean | true 表示启动时随机选择 peer port
+| `peer-port` | number | 端口号
+| `pex-enabled` | boolean | true 表示允许 public torrent 中的 PEX
+| `port-forwarding-enabled` | boolean | true 表示要求上游路由器使用 UPnP 或 NAT-PMP 将配置的 peer port 转发到 transmission
+| `queue-stalled-enabled` | boolean | 是否将空闲 torrent 视为 stalled
+| `queue-stalled-minutes` | number | 空闲 N 分钟的 torrent 不计入 seed-queue-size 或 download-queue-size
+| `rename-partial-files` | boolean | true 表示向未完成文件追加 `.part`
+| `reqq` | number | 一个 peer 被允许在客户端中排队的未完成 block 请求数量
+| `rpc-version-minimum` | number | 支持的最低 RPC API 版本
+| `rpc-version-semver` | string | 采用 [semver](https://semver.org) 兼容字符串表示的当前 RPC API 版本
+| `rpc-version` | number | 当前 RPC API 版本
+| `script-torrent-added-enabled` | boolean | 是否调用 `added` 脚本
+| `script-torrent-added-filename` | string | 要运行的脚本文件名
+| `script-torrent-done-enabled` | boolean | 是否调用 `done` 脚本
+| `script-torrent-done-filename` | string | 要运行的脚本文件名
+| `script-torrent-done-seeding-enabled` | boolean | 是否调用 `seeding-done` 脚本
+| `script-torrent-done-seeding-filename` | string | 要运行的脚本文件名
+| `seed-queue-enabled` | boolean | 如果为 true，则限制可同时上传的 torrent 数量
+| `seed-queue-size` | number | 可同时上传的最大 torrent 数量（见 seed-queue-enabled）
+| `seedRatioLimit` | double | torrent 使用的默认做种比例
+| `seedRatioLimited` | boolean | 如果默认遵守 seedRatioLimit 则为 true
+| `sequential_download` | boolean | true 表示添加的 torrent 默认启用顺序下载
+| `session-id` | string | 当前 `X-Transmission-Session-Id` 值
+| `speed-limit-down-enabled` | boolean | true 表示已启用
+| `speed-limit-down` | number | 最大全局下载速度（KBps）
+| `speed-limit-up-enabled` | boolean | true 表示已启用
+| `speed-limit-up` | number | 最大全局上传速度（KBps）
+| `start-added-torrents` | boolean | true 表示添加的 torrent 会立即启动
+| `trash-original-torrent-files` | boolean | true 表示会删除已添加 torrent 的 .torrent 文件
+| `units` | object | 见下文
+| `utp-enabled` | boolean | true 表示允许 UTP
+| `version` | string | 长版本字符串 `$version ($revision)`
 
 
-`units`: an object containing:
+`units`：包含以下内容的对象：
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
-| `speed-units`  | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
-| `speed-bytes`  | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
-| `size-units`   | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
-| `size-bytes`   | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
-| `memory-units` | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
-| `memory-bytes` | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
+| `speed-units`  | array  | 4 个字符串：KB/s、MB/s、GB/s、TB/s
+| `speed-bytes`  | number | 一个 KB 中的字节数（kB 为 1000；KiB 为 1024）
+| `size-units`   | array  | 4 个字符串：KB/s、MB/s、GB/s、TB/s
+| `size-bytes`   | number | 一个 KB 中的字节数（kB 为 1000；KiB 为 1024）
+| `memory-units` | array  | 4 个字符串：KB/s、MB/s、GB/s、TB/s
+| `memory-bytes` | number | 一个 KB 中的字节数（kB 为 1000；KiB 为 1024）
 
-`rpc-version` indicates the RPC interface version supported by the RPC server.
-It is incremented when a new version of Transmission changes the RPC interface.
+`rpc-version` 表示 RPC 服务器支持的 RPC 接口版本。
+当新版 Transmission 改变 RPC 接口时，它会递增。
 
-`rpc-version-minimum` indicates the oldest API supported by the RPC server.
-It is changes when a new version of Transmission changes the RPC interface
-in a way that is not backwards compatible. There are no plans for this
-to be common behavior.
+`rpc-version-minimum` 表示 RPC 服务器支持的最旧 API。
+当新版 Transmission 以不向后兼容的方式改变 RPC 接口时，它会变化。没有计划让这种行为变得常见。
 
-#### 4.1.1 Mutators
-Method name: `session-set`
+#### 4.1.1 修改器
+方法名称：`session-set`
 
-Request arguments: the mutable properties from 4.1's arguments, i.e. all of them
-except:
+请求参数：4.1 参数中的可变属性，即除以下之外的所有属性：
 
 * `blocklist-size`
 * `config-dir`
@@ -620,36 +575,35 @@ except:
 * `units`
 * `version`
 
-Response arguments: none
+响应参数：无
 
-#### 4.1.2 Accessors
-Method name: `session-get`
+#### 4.1.2 访问器
+方法名称：`session-get`
 
-Request arguments: an optional `fields` array of keys (see 4.1)
+请求参数：可选的 `fields` 键数组（见 4.1）
 
-Response arguments: key/value pairs matching the request's `fields`
-argument if present, or all supported fields (see 4.1) otherwise.
+响应参数：如果存在请求的 `fields` 参数，则为与其匹配的 key/value 对；否则为所有支持的字段（见 4.1）。
 
-### 4.2 Session statistics
-Method name: `session-stats`
+### 4.2 Session 统计信息
+方法名称：`session-stats`
 
-Request arguments: none
+请求参数：无
 
-Response arguments:
+响应参数：
 
-| Key | Value Type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
 | `activeTorrentCount`       | number
 | `downloadSpeed`            | number
 | `pausedTorrentCount`       | number
 | `torrentCount`             | number
 | `uploadSpeed`              | number
-| `cumulative-stats`         | stats object (see below)
-| `current-stats`            | stats object (see below)
+| `cumulative-stats`         | stats object（见下文）
+| `current-stats`            | stats object（见下文）
 
-A stats object contains:
+stats object 包含：
 
-| Key | Value Type | transmission.h source
+| 键 | 值类型 | transmission.h source
 |:--|:--|:--
 | `uploadedBytes`    | number     | tr_session_stats
 | `downloadedBytes`  | number     | tr_session_stats
@@ -658,382 +612,369 @@ A stats object contains:
 | `secondsActive`    | number     | tr_session_stats
 
 ### 4.3 Blocklist
-Method name: `blocklist-update`
+方法名称：`blocklist-update`
 
-Request arguments: none
+请求参数：无
 
-Response arguments: a number `blocklist-size`
+响应参数：数字 `blocklist-size`
 
-### 4.4 Port checking
-This method tests to see if your incoming peer port is accessible
-from the outside world.
+### 4.4 端口检查
+此方法测试你的传入 peer port 是否可从外部访问。
 
-Method name: `port-test`
+方法名称：`port-test`
 
-Request arguments: an optional argument `ip_protocol`.
-`ip_protocol` is a string specifying the IP protocol version to be used for the port test.
-Set to `ipv4` to check IPv4, or set to `ipv6` to check IPv6.
-For backwards compatibility, it is allowed to omit this argument to get the behaviour before Transmission `4.1.0`,
-which is to check whichever IP protocol the OS happened to use to connect to our port test service,
-frankly not very useful.
+请求参数：可选参数 `ip_protocol`。
+`ip_protocol` 是一个字符串，指定端口测试要使用的 IP 协议版本。
+设置为 `ipv4` 以检查 IPv4，或设置为 `ipv6` 以检查 IPv6。
+为了向后兼容，允许省略此参数以获得 Transmission `4.1.0` 之前的行为，即检查操作系统碰巧用来连接我们端口测试服务的 IP 协议；坦率地说，这并不很有用。
 
-Response arguments:
+响应参数：
 
-| Key | Value Type | Description
+| 键 | 值类型 | 说明
 | :-- | :-- | :--
-| `port-is-open` | boolean | true if port is open, false if port is closed
-| `ip_protocol` | string | `ipv4` if the test was carried out on IPv4, `ipv6` if the test was carried out on IPv6, unset if it cannot be determined
+| `port-is-open` | boolean | 端口打开时为 true，端口关闭时为 false
+| `ip_protocol` | string | 如果测试在 IPv4 上执行则为 `ipv4`，如果测试在 IPv6 上执行则为 `ipv6`，如果无法确定则未设置
 
-### 4.5 Session shutdown
-This method tells the transmission session to shut down.
+### 4.5 Session 关闭
+此方法告知 transmission session 关闭。
 
-Method name: `session-close`
+方法名称：`session-close`
 
-Request arguments: none
+请求参数：无
 
-Response arguments: none
+响应参数：无
 
-### 4.6 Queue movement requests
-| Method name | transmission.h source
+### 4.6 队列移动请求
+| 方法名称 | transmission.h source
 |:--|:--
 | `queue-move-top` | tr_torrentQueueMoveTop()
 | `queue-move-up` | tr_torrentQueueMoveUp()
 | `queue-move-down` | tr_torrentQueueMoveDown()
 | `queue-move-bottom` | tr_torrentQueueMoveBottom()
 
-Request arguments:
+请求参数：
 
-| Key | Value Type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `ids` | array | torrent list, as described in 3.1.
+| `ids` | array | torrent 列表，如 3.1 所述。
 
-Response arguments: none
+响应参数：无
 
-### 4.7 Free space
-This method tests how much free space is available in a
-client-specified folder.
+### 4.7 可用空间
+此方法测试客户端指定文件夹中有多少可用空间。
 
-Method name: `free-space`
+方法名称：`free-space`
 
-Request arguments:
+请求参数：
 
-| Key | Value type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `path` | string | the directory to query
+| `path` | string | 要查询的目录
 
-Response arguments:
+响应参数：
 
-| Key | Value type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `path` | string | same as the Request argument
-| `size-bytes` | number | the size, in bytes, of the free space in that directory
-| `total_size` | number | the total capacity, in bytes, of that directory
+| `path` | string | 与请求参数相同
+| `size-bytes` | number | 该目录中可用空间的大小（字节）
+| `total_size` | number | 该目录的总容量（字节）
 
-### 4.8 Bandwidth groups
-#### 4.8.1 Bandwidth group mutator: `group-set`
-Method name: `group-set`
+### 4.8 带宽组
+#### 4.8.1 带宽组修改器：`group-set`
+方法名称：`group-set`
 
-Request parameters:
+请求参数：
 
-| Key | Value type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `honorsSessionLimits` | boolean  | true if session upload limits are honored
-| `name` | string | Bandwidth group name
-| `speed-limit-down-enabled` | boolean | true means enabled
-| `speed-limit-down` | number | max global download speed (KBps)
-| `speed-limit-up-enabled` | boolean | true means enabled
-| `speed-limit-up` | number | max global upload speed (KBps)
+| `honorsSessionLimits` | boolean  | 如果遵守 session 上传限制则为 true
+| `name` | string | 带宽组名称
+| `speed-limit-down-enabled` | boolean | true 表示已启用
+| `speed-limit-down` | number | 最大全局下载速度（KBps）
+| `speed-limit-up-enabled` | boolean | true 表示已启用
+| `speed-limit-up` | number | 最大全局上传速度（KBps）
 
-Response arguments: none
+响应参数：无
 
-#### 4.8.2 Bandwidth group accessor: `group-get`
-Method name: `group-get`
+#### 4.8.2 带宽组访问器：`group-get`
+方法名称：`group-get`
 
-Request arguments: An optional argument `group`.
-`group` is either a string naming the bandwidth group,
-or a list of such strings.
-If `group` is omitted, all bandwidth groups are used.
+请求参数：可选参数 `group`。
+`group` 可以是命名带宽组的字符串，也可以是此类字符串的列表。
+如果省略 `group`，则使用所有带宽组。
 
-Response arguments:
+响应参数：
 
-| Key | Value type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-|`group`| array | A list of bandwidth group description objects
+|`group`| array | 带宽组说明对象列表
 
-A bandwidth group description object has:
+带宽组说明对象包含：
 
-| Key | Value type | Description
+| 键 | 值类型 | 说明
 |:--|:--|:--
-| `honorsSessionLimits` | boolean  | true if session upload limits are honored
-| `name` | string | Bandwidth group name
-| `speed-limit-down-enabled` | boolean | true means enabled
-| `speed-limit-down` | number | max global download speed (KBps)
-| `speed-limit-up-enabled` | boolean | true means enabled
-| `speed-limit-up` | number | max global upload speed (KBps)
+| `honorsSessionLimits` | boolean  | 如果遵守 session 上传限制则为 true
+| `name` | string | 带宽组名称
+| `speed-limit-down-enabled` | boolean | true 表示已启用
+| `speed-limit-down` | number | 最大全局下载速度（KBps）
+| `speed-limit-up-enabled` | boolean | true 表示已启用
+| `speed-limit-up` | number | 最大全局上传速度（KBps）
 
-## 5 Protocol versions
-This section lists the changes that have been made to the RPC protocol.
+## 5 协议版本
+本节列出了对 RPC 协议所做的更改。
 
-There are two ways to check for API compatibility. Since most developers know
-[semver](https://semver.org/), session-get's `rpc-version-semver` is the
-recommended way. That value is a semver-compatible string of the RPC protocol
-version number.
+有两种方式可以检查 API 兼容性。由于大多数开发者都了解 [semver](https://semver.org/)，因此推荐使用 session-get 的 `rpc-version-semver`。该值是 RPC 协议版本号的 semver 兼容字符串。
 
-Since Transmission predates the semver 1.0 spec, the previous scheme was for
-the RPC version to be a whole number and to increment it whenever a change was
-made. That is session-get's `rpc-version`. `rpc-version-minimum` lists the
-oldest version that is compatible with the current version; i.e. an app coded
-to use `rpc-version-minimum` would still work on a Transmission release running
-`rpc-version`.
+由于 Transmission 早于 semver 1.0 规范，之前的方案是让 RPC 版本成为整数，并在每次发生更改时递增。这就是 session-get 的 `rpc-version`。`rpc-version-minimum` 列出了与当前版本兼容的最旧版本；也就是说，编写为使用 `rpc-version-minimum` 的应用仍可在运行 `rpc-version` 的 Transmission 版本上工作。
 
-Breaking changes are denoted with a :bomb: emoji.
+破坏性更改用 :bomb: emoji 标记。
 
-Transmission 1.30 (`rpc-version-semver` 1.0.0, `rpc-version`: 1)
+Transmission 1.30（`rpc-version-semver` 1.0.0，`rpc-version`: 1）
 
-Initial revision.
+初始修订。
 
-Transmission 1.40 (`rpc-version-semver` 1.1.0, `rpc-version`: 2)
+Transmission 1.40（`rpc-version-semver` 1.1.0，`rpc-version`: 2）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `torrent-get` | new `port` to `peers`
+| `torrent-get` | `peers` 新增 `port`
 
-Transmission 1.41 (`rpc-version-semver` 1.2.0, `rpc-version`: 3)
+Transmission 1.41（`rpc-version-semver` 1.2.0，`rpc-version`: 3）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `session-get`      | new arg `version`
-| `torrent-get`      | new arg `downloaders`
-| `torrent-remove`   | new method
+| `session-get`      | 新 arg `version`
+| `torrent-get`      | 新 arg `downloaders`
+| `torrent-remove`   | 新方法
 
-Transmission 1.50 (`rpc-version-semver` 1.3.0, `rpc-version`: 4)
+Transmission 1.50（`rpc-version-semver` 1.3.0，`rpc-version`: 4）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-|`session-get`       | new arg `rpc-version-minimum`
-|`session-get`       | new arg `rpc-version`
-|`session-stats`     | added `cumulative-stats`
-|`session-stats`     | added `current-stats`
-|`torrent-get`       | new arg `downloadDir`
+|`session-get`       | 新 arg `rpc-version-minimum`
+|`session-get`       | 新 arg `rpc-version`
+|`session-stats`     | 添加 `cumulative-stats`
+|`session-stats`     | 添加 `current-stats`
+|`torrent-get`       | 新 arg `downloadDir`
 
-Transmission 1.60 (`rpc-version-semver` 2.0.0, `rpc-version`: 5)
+Transmission 1.60（`rpc-version-semver` 2.0.0，`rpc-version`: 5）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `session-get` | :bomb: renamed `peer-limit` to `peer-limit-global`
-| `session-get` | :bomb: renamed `pex-allowed` to `pex-enabled`
-| `session-get` | :bomb: renamed `port` to `peer-port`
-| `torrent-get` | :bomb: removed arg `downloadLimitMode`
-| `torrent-get` | :bomb: removed arg `uploadLimitMode`
-| `torrent-set` | :bomb: renamed `speed-limit-down-enabled` to `downloadLimited`
-| `torrent-set` | :bomb: renamed `speed-limit-down` to `downloadLimit`
-| `torrent-set` | :bomb: renamed `speed-limit-up-enabled` to `uploadLimited`
-| `torrent-set` | :bomb: renamed `speed-limit-up` to `uploadLimit`
-| `blocklist-update` | new method
-| `port-test` | new method
-| `session-get` | new arg `alt-speed-begin`
-| `session-get` | new arg `alt-speed-down`
-| `session-get` | new arg `alt-speed-enabled`
-| `session-get` | new arg `alt-speed-end`
-| `session-get` | new arg `alt-speed-time-enabled`
-| `session-get` | new arg `alt-speed-up`
-| `session-get` | new arg `blocklist-enabled`
-| `session-get` | new arg `blocklist-size`
-| `session-get` | new arg `peer-limit-per-torrent`
-| `session-get` | new arg `seedRatioLimit`
-| `session-get` | new arg `seedRatioLimited`
-| `torrent-add` | new arg `files-unwanted`
-| `torrent-add` | new arg `files-wanted`
-| `torrent-add` | new arg `priority-high`
-| `torrent-add` | new arg `priority-low`
-| `torrent-add` | new arg `priority-normal`
-| `torrent-get` | new arg `bandwidthPriority`
-| `torrent-get` | new arg `fileStats`
-| `torrent-get` | new arg `honorsSessionLimits`
-| `torrent-get` | new arg `percentDone`
-| `torrent-get` | new arg `pieces`
-| `torrent-get` | new arg `seedRatioLimit`
-| `torrent-get` | new arg `seedRatioMode`
-| `torrent-get` | new arg `torrentFile`
-| `torrent-get` | new ids option `recently-active`
-| `torrent-reannounce` | new method
-| `torrent-set` | new arg `bandwidthPriority`
-| `torrent-set` | new arg `honorsSessionLimits`
-| `torrent-set` | new arg `seedRatioLimit`
-| `torrent-set` | new arg `seedRatioLimited`
+| `session-get` | :bomb: 将 `peer-limit` 重命名为 `peer-limit-global`
+| `session-get` | :bomb: 将 `pex-allowed` 重命名为 `pex-enabled`
+| `session-get` | :bomb: 将 `port` 重命名为 `peer-port`
+| `torrent-get` | :bomb: 移除 arg `downloadLimitMode`
+| `torrent-get` | :bomb: 移除 arg `uploadLimitMode`
+| `torrent-set` | :bomb: 将 `speed-limit-down-enabled` 重命名为 `downloadLimited`
+| `torrent-set` | :bomb: 将 `speed-limit-down` 重命名为 `downloadLimit`
+| `torrent-set` | :bomb: 将 `speed-limit-up-enabled` 重命名为 `uploadLimited`
+| `torrent-set` | :bomb: 将 `speed-limit-up` 重命名为 `uploadLimit`
+| `blocklist-update` | 新方法
+| `port-test` | 新方法
+| `session-get` | 新 arg `alt-speed-begin`
+| `session-get` | 新 arg `alt-speed-down`
+| `session-get` | 新 arg `alt-speed-enabled`
+| `session-get` | 新 arg `alt-speed-end`
+| `session-get` | 新 arg `alt-speed-time-enabled`
+| `session-get` | 新 arg `alt-speed-up`
+| `session-get` | 新 arg `blocklist-enabled`
+| `session-get` | 新 arg `blocklist-size`
+| `session-get` | 新 arg `peer-limit-per-torrent`
+| `session-get` | 新 arg `seedRatioLimit`
+| `session-get` | 新 arg `seedRatioLimited`
+| `torrent-add` | 新 arg `files-unwanted`
+| `torrent-add` | 新 arg `files-wanted`
+| `torrent-add` | 新 arg `priority-high`
+| `torrent-add` | 新 arg `priority-low`
+| `torrent-add` | 新 arg `priority-normal`
+| `torrent-get` | 新 arg `bandwidthPriority`
+| `torrent-get` | 新 arg `fileStats`
+| `torrent-get` | 新 arg `honorsSessionLimits`
+| `torrent-get` | 新 arg `percentDone`
+| `torrent-get` | 新 arg `pieces`
+| `torrent-get` | 新 arg `seedRatioLimit`
+| `torrent-get` | 新 arg `seedRatioMode`
+| `torrent-get` | 新 arg `torrentFile`
+| `torrent-get` | 新 ids 选项 `recently-active`
+| `torrent-reannounce` | 新方法
+| `torrent-set` | 新 arg `bandwidthPriority`
+| `torrent-set` | 新 arg `honorsSessionLimits`
+| `torrent-set` | 新 arg `seedRatioLimit`
+| `torrent-set` | 新 arg `seedRatioLimited`
 
-Transmission 1.70 (`rpc-version-semver` 2.1.0, `rpc-version`: 6)
+Transmission 1.70（`rpc-version-semver` 2.1.0，`rpc-version`: 6）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `method torrent-set-location` | new method
+| `method torrent-set-location` | 新方法
 
-Transmission 1.80 (`rpc-version-semver` 3.0.0, `rpc-version`: 7)
+Transmission 1.80（`rpc-version-semver` 3.0.0，`rpc-version`: 7）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `torrent-get` | :bomb: removed arg `announceResponse` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `announceURL` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `downloaders` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `lastAnnounceTime` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `lastScrapeTime` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `leechers` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `nextAnnounceTime` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `nextScrapeTime` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `scrapeResponse` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `scrapeURL` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `seeders` (use `trackerStats instead`)
-| `torrent-get` | :bomb: removed arg `swarmSpeed`
-| `torrent-get` | :bomb: removed arg `timesCompleted` (use `trackerStats instead`)
-| `session-set` | new arg `incomplete-dir-enabled`
-| `session-set` | new arg `incomplete-dir`
-| `torrent-get` | new arg `magnetLink`
-| `torrent-get` | new arg `metadataPercentComplete`
-| `torrent-get` | new arg `trackerStats`
+| `torrent-get` | :bomb: 移除 arg `announceResponse`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `announceURL`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `downloaders`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `lastAnnounceTime`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `lastScrapeTime`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `leechers`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `nextAnnounceTime`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `nextScrapeTime`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `scrapeResponse`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `scrapeURL`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `seeders`（使用 `trackerStats instead`）
+| `torrent-get` | :bomb: 移除 arg `swarmSpeed`
+| `torrent-get` | :bomb: 移除 arg `timesCompleted`（使用 `trackerStats instead`）
+| `session-set` | 新 arg `incomplete-dir-enabled`
+| `session-set` | 新 arg `incomplete-dir`
+| `torrent-get` | 新 arg `magnetLink`
+| `torrent-get` | 新 arg `metadataPercentComplete`
+| `torrent-get` | 新 arg `trackerStats`
 
-Transmission 1.90 (`rpc-version-semver` 3.1.0, `rpc-version`: 8)
+Transmission 1.90（`rpc-version-semver` 3.1.0，`rpc-version`: 8）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `session-set` | new arg `rename-partial-files`
-| `session-get` | new arg `rename-partial-files`
-| `session-get` | new arg `config-dir`
-| `torrent-add` | new arg `bandwidthPriority`
-| `torrent-get` | new trackerStats arg `lastAnnounceTimedOut`
+| `session-set` | 新 arg `rename-partial-files`
+| `session-get` | 新 arg `rename-partial-files`
+| `session-get` | 新 arg `config-dir`
+| `torrent-add` | 新 arg `bandwidthPriority`
+| `torrent-get` | 新 trackerStats arg `lastAnnounceTimedOut`
 
-Transmission 1.92 (`rpc-version-semver` 3.2.0, `rpc-version`: 8)
+Transmission 1.92（`rpc-version-semver` 3.2.0，`rpc-version`: 8）
 
-Note: `rpc-version` was not bumped in this release due to an oversight.
+注意：由于疏忽，此版本中未递增 `rpc-version`。
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `torrent-get` | new trackerStats arg `lastScrapeTimedOut`
+| `torrent-get` | 新 trackerStats arg `lastScrapeTimedOut`
 
-Transmission 2.00 (`rpc-version-semver` 3.3.0, `rpc-version`: 9)
+Transmission 2.00（`rpc-version-semver` 3.3.0，`rpc-version`: 9）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `session-set` | new arg `start-added-torrents`
-| `session-set` | new arg `trash-original-torrent-files`
-| `session-get` | new arg `start-added-torrents`
-| `session-get` | new arg `trash-original-torrent-files`
-| `torrent-get` | new arg `isFinished`
+| `session-set` | 新 arg `start-added-torrents`
+| `session-set` | 新 arg `trash-original-torrent-files`
+| `session-get` | 新 arg `start-added-torrents`
+| `session-get` | 新 arg `trash-original-torrent-files`
+| `torrent-get` | 新 arg `isFinished`
 
-Transmission 2.10 (`rpc-version-semver` 3.4.0, `rpc-version`: 10)
+Transmission 2.10（`rpc-version-semver` 3.4.0，`rpc-version`: 10）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `session-get` | new arg `cache-size-mb`
-| `session-get` | new arg `units`
-| `session-set` | new arg `idle-seeding-limit-enabled`
-| `session-set` | new arg `idle-seeding-limit`
-| `torrent-set` | new arg `seedIdleLimit`
-| `torrent-set` | new arg `seedIdleMode`
-| `torrent-set` | new arg `trackerAdd`
-| `torrent-set` | new arg `trackerRemove`
-| `torrent-set` | new arg `trackerReplace`
+| `session-get` | 新 arg `cache-size-mb`
+| `session-get` | 新 arg `units`
+| `session-set` | 新 arg `idle-seeding-limit-enabled`
+| `session-set` | 新 arg `idle-seeding-limit`
+| `torrent-set` | 新 arg `seedIdleLimit`
+| `torrent-set` | 新 arg `seedIdleMode`
+| `torrent-set` | 新 arg `trackerAdd`
+| `torrent-set` | 新 arg `trackerRemove`
+| `torrent-set` | 新 arg `trackerReplace`
 
-Transmission 2.12 (`rpc-version-semver` 3.5.0, `rpc-version`: 11)
+Transmission 2.12（`rpc-version-semver` 3.5.0，`rpc-version`: 11）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `session-get` | new arg `blocklist-url`
-| `session-set` | new arg `blocklist-url`
+| `session-get` | 新 arg `blocklist-url`
+| `session-set` | 新 arg `blocklist-url`
 
-Transmission 2.20 (`rpc-version-semver` 3.6.0, `rpc-version`: 12)
+Transmission 2.20（`rpc-version-semver` 3.6.0，`rpc-version`: 12）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `session-get` | new arg `download-dir-free-space`
-| `session-close` | new method
+| `session-get` | 新 arg `download-dir-free-space`
+| `session-close` | 新方法
 
-Transmission 2.30 (`rpc-version-semver` 4.0.0, `rpc-version`: 13)
+Transmission 2.30（`rpc-version-semver` 4.0.0，`rpc-version`: 13）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `torrent-get` | :bomb: removed arg `peersKnown`
-| `torrent-get` | new arg `isUTP` to the `peers` list
-| `torrent-add` | new arg `cookies`
+| `torrent-get` | :bomb: 移除 arg `peersKnown`
+| `torrent-get` | `peers` 列表新增 arg `isUTP`
+| `torrent-add` | 新 arg `cookies`
 
-Transmission 2.40 (`rpc-version-semver` 5.0.0, `rpc-version`: 14)
+Transmission 2.40（`rpc-version-semver` 5.0.0，`rpc-version`: 14）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `torrent-get` | :bomb: values of `status` field changed
-| `queue-move-bottom` | new method
-| `queue-move-down` | new method
-| `queue-move-top` | new method
-| `session-set` | new arg `download-queue-enabled`
-| `session-set` | new arg `download-queue-size`
-| `session-set` | new arg `queue-stalled-enabled`
-| `session-set` | new arg `queue-stalled-minutes`
-| `session-set` | new arg `seed-queue-enabled`
-| `session-set` | new arg `seed-queue-size`
-| `torrent-get` | new arg `fromLpd` in peersFrom
-| `torrent-get` | new arg `isStalled`
-| `torrent-get` | new arg `queuePosition`
-| `torrent-set` | new arg `queuePosition`
-| `torrent-start-now` | new method
+| `torrent-get` | :bomb: `status` 字段的值已更改
+| `queue-move-bottom` | 新方法
+| `queue-move-down` | 新方法
+| `queue-move-top` | 新方法
+| `session-set` | 新 arg `download-queue-enabled`
+| `session-set` | 新 arg `download-queue-size`
+| `session-set` | 新 arg `queue-stalled-enabled`
+| `session-set` | 新 arg `queue-stalled-minutes`
+| `session-set` | 新 arg `seed-queue-enabled`
+| `session-set` | 新 arg `seed-queue-size`
+| `torrent-get` | peersFrom 中新增 arg `fromLpd`
+| `torrent-get` | 新 arg `isStalled`
+| `torrent-get` | 新 arg `queuePosition`
+| `torrent-set` | 新 arg `queuePosition`
+| `torrent-start-now` | 新方法
 
-Transmission 2.80 (`rpc-version-semver` 5.1.0, `rpc-version`: 15)
+Transmission 2.80（`rpc-version-semver` 5.1.0，`rpc-version`: 15）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `torrent-get`         | new arg `etaIdle`
-| `torrent-rename-path` | new method
-| `free-space`          | new method
-| `torrent-add`         | new return arg `torrent-duplicate`
+| `torrent-get`         | 新 arg `etaIdle`
+| `torrent-rename-path` | 新方法
+| `free-space`          | 新方法
+| `torrent-add`         | 新返回 arg `torrent-duplicate`
 
-Transmission 3.00 (`rpc-version-semver` 5.2.0, `rpc-version`: 16)
+Transmission 3.00（`rpc-version-semver` 5.2.0，`rpc-version`: 16）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `session-get` | new request arg `fields`
-| `session-get` | new arg `session-id`
-| `torrent-get` | new arg `labels`
-| `torrent-set` | new arg `labels`
-| `torrent-get` | new arg `editDate`
-| `torrent-get` | new request arg `format`
+| `session-get` | 新请求 arg `fields`
+| `session-get` | 新 arg `session-id`
+| `torrent-get` | 新 arg `labels`
+| `torrent-set` | 新 arg `labels`
+| `torrent-get` | 新 arg `editDate`
+| `torrent-get` | 新请求 arg `format`
 
-Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
+Transmission 4.0.0（`rpc-version-semver` 5.3.0，`rpc-version`: 17）
 
-| Method | Description
+| 方法 | 说明
 |:---|:---
-| `/upload` | :warning: undocumented `/upload` endpoint removed
-| `session-get` | :warning: **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
-| `free-space` | new return arg `total_size`
-| `session-get` | new arg `default-trackers`
-| `session-get` | new arg `rpc-version-semver`
-| `session-get` | new arg `script-torrent-added-enabled`
-| `session-get` | new arg `script-torrent-added-filename`
-| `session-get` | new arg `script-torrent-done-seeding-enabled`
-| `session-get` | new arg `script-torrent-done-seeding-filename`
-| `torrent-add` | new arg `labels`
-| `torrent-get` | new arg `availability`
-| `torrent-get` | new arg `file-count`
-| `torrent-get` | new arg `group`
-| `torrent-get` | new arg `percentComplete`
-| `torrent-get` | new arg `primary-mime-type`
-| `torrent-get` | new arg `tracker.sitename`
-| `torrent-get` | new arg `trackerStats.sitename`
-| `torrent-get` | new arg `trackerList`
-| `torrent-set` | new arg `group`
-| `torrent-set` | new arg `trackerList`
-| `torrent-set` | :warning: **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
-| `torrent-set` | :warning: **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
-| `torrent-set` | :warning: **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
-| `group-set` | new method
-| `group-get` | new method
-| `torrent-get` | :warning: old arg `wanted` was implemented as an array of `0` or `1` in Transmission 3.00 and older, despite being documented as an array of booleans. Transmission 4.0.0 and 4.0.1 "fixed" this by returning an array of booleans; but in practical terms, this change caused an unannounced breaking change for any 3rd party code that expected `0` or `1`. For this reason, 4.0.2 restored the 3.00 behavior and updated this spec to match the code.
+| `/upload` | :warning: 移除未文档化的 `/upload` endpoint
+| `session-get` | :warning: **DEPRECATED** `download-dir-free-space`。改用 `free-space`。
+| `free-space` | 新返回 arg `total_size`
+| `session-get` | 新 arg `default-trackers`
+| `session-get` | 新 arg `rpc-version-semver`
+| `session-get` | 新 arg `script-torrent-added-enabled`
+| `session-get` | 新 arg `script-torrent-added-filename`
+| `session-get` | 新 arg `script-torrent-done-seeding-enabled`
+| `session-get` | 新 arg `script-torrent-done-seeding-filename`
+| `torrent-add` | 新 arg `labels`
+| `torrent-get` | 新 arg `availability`
+| `torrent-get` | 新 arg `file-count`
+| `torrent-get` | 新 arg `group`
+| `torrent-get` | 新 arg `percentComplete`
+| `torrent-get` | 新 arg `primary-mime-type`
+| `torrent-get` | 新 arg `tracker.sitename`
+| `torrent-get` | 新 arg `trackerStats.sitename`
+| `torrent-get` | 新 arg `trackerList`
+| `torrent-set` | 新 arg `group`
+| `torrent-set` | 新 arg `trackerList`
+| `torrent-set` | :warning: **DEPRECATED** `trackerAdd`。改用 `trackerList`。
+| `torrent-set` | :warning: **DEPRECATED** `trackerRemove`。改用 `trackerList`。
+| `torrent-set` | :warning: **DEPRECATED** `trackerReplace`。改用 `trackerList`。
+| `group-set` | 新方法
+| `group-get` | 新方法
+| `torrent-get` | :warning: 旧 arg `wanted` 在 Transmission 3.00 及更早版本中实现为 `0` 或 `1` 数组，尽管文档记录为 boolean 数组。Transmission 4.0.0 和 4.0.1 通过返回 boolean 数组“修复”了这一点；但实际上，此更改对任何期望 `0` 或 `1` 的第三方代码造成了未宣布的破坏性更改。因此，4.0.2 恢复了 3.00 的行为，并更新此规范以匹配代码。
 
-Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
-| Method | Description
+Transmission 4.1.0（`rpc-version-semver` 5.4.0，`rpc-version`: 18）
+| 方法 | 说明
 |:---|:---
-| `session-get` | new arg `sequential_download`
-| `session-set` | new arg `sequential_download`
-| `torrent-add` | new arg `sequential_download`
-| `torrent-get` | new arg `sequential_download`
-| `torrent-set` | new arg `sequential_download`
-| `torrent-get` | new arg `files.begin_piece`
-| `torrent-get` | new arg `files.end_piece`
-| `port-test` | new arg `ip_protocol`
+| `session-get` | 新 arg `sequential_download`
+| `session-set` | 新 arg `sequential_download`
+| `torrent-add` | 新 arg `sequential_download`
+| `torrent-get` | 新 arg `sequential_download`
+| `torrent-set` | 新 arg `sequential_download`
+| `torrent-get` | 新 arg `files.begin_piece`
+| `torrent-get` | 新 arg `files.end_piece`
+| `port-test` | 新 arg `ip_protocol`

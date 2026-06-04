@@ -4,6 +4,15 @@
     "appVersionSource": "local"
   },
   "build": {
+    "apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "APP_ENV": "production"
+      }
+    },
     "development": {
       "distribution": "internal",
       "developmentClient": true,
@@ -13,8 +22,7 @@
     },
     "production": {
       "env": {
-        "APP_ENV": "production",
-        "EXPO_PUBLIC_RC_ANDROID_API_KEY": "goog_uNXCRlvZBzcmvjaKZSuDvDUVlmm"
+        "APP_ENV": "production"
       }
     }
   },

@@ -15,24 +15,14 @@ const icon = require("../../../../assets/images/icon.png");
 
 const links = [
   {
-    title: "Website",
-    description: "Official homepage",
-    url: "https://remote.jg.ar",
+    title: "代码仓库",
+    description: "浏览源代码并跟踪开发进度",
+    url: "https://github.com/gmcf111/remote-appzhcn",
   },
   {
-    title: "Wiki",
-    description: "Documentation, setup guides, and troubleshooting",
-    url: "https://github.com/jgalat/remote-app/wiki",
-  },
-  {
-    title: "Repository",
-    description: "Browse the source code and track development",
-    url: "https://github.com/jgalat/remote-app",
-  },
-  {
-    title: "Issue Tracker",
-    description: "Report bugs and request features",
-    url: "https://github.com/jgalat/remote-app/issues",
+    title: "问题跟踪",
+    description: "报告错误并请求新功能",
+    url: "https://github.com/gmcf111/remote-appzhcn/issues",
   },
 ];
 
@@ -47,7 +37,7 @@ export default function AboutScreen() {
           source={icon}
           style={styles.icon}
         />
-        <Text style={styles.title}>Remote for Transmission</Text>
+        <Text style={styles.title}>Remote App 中文版</Text>
         <Text style={[styles.version, { color: lightGray }]}>
           {appVersion}
         </Text>

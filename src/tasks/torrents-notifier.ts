@@ -51,10 +51,8 @@ export default async function TorrentsNotifierTask(): Promise<BackgroundTask.Bac
 
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "Finished torrents",
-          body: `${server.name}: ${done.length} ${
-            done.length === 1 ? "torrent has" : "torrents have"
-          } finished downloading`,
+          title: "已完成种子",
+          body: `${server.name}: ${done.length} 个种子已完成下载`,
         },
         trigger: null,
       });

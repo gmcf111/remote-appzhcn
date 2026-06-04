@@ -47,10 +47,10 @@ export default React.memo(function TorrentItem({
   let progressColor = color;
   switch (torrent.status) {
     case TorrentStatus.DOWNLOADING:
-      status = `${status} - ${torrent.peersSendingToUs} / ${torrent.peersConnected} peers`;
+      status = `${status} - ${torrent.peersSendingToUs} / ${torrent.peersConnected} Peer`;
       break;
     case TorrentStatus.SEEDING:
-      status = `${status} - ${torrent.peersGettingFromUs} / ${torrent.peersConnected} peers`;
+      status = `${status} - ${torrent.peersGettingFromUs} / ${torrent.peersConnected} Peer`;
       progressColor = green;
       break;
     case TorrentStatus.VERIFYING_LOCAL_DATA:

@@ -23,10 +23,10 @@ export default React.memo(function PeerItem({ data }: Props) {
     try {
       await Share.share(
         { message: address },
-        { dialogTitle: "Share peer" },
+        { dialogTitle: "分享 Peer" },
       );
     } catch {
-      ToastAndroid.show("Failed to share peer", ToastAndroid.SHORT);
+      ToastAndroid.show("分享 Peer 失败", ToastAndroid.SHORT);
     }
   }, [address]);
 
@@ -50,11 +50,11 @@ export default React.memo(function PeerItem({ data }: Props) {
               <Text color={gray} style={styles.data}>
                 {data.isEncrypted ? (
                   <>
-                    <Feather name="lock" color={green} /> Encrypted
+                    <Feather name="lock" color={green} /> 已加密
                   </>
                 ) : (
                   <>
-                    <Feather name="unlock" color={red} /> Unencrypted
+                    <Feather name="unlock" color={red} /> 未加密
                   </>
                 )}
               </Text>

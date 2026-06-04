@@ -23,7 +23,7 @@ function RemoveConfirmSheet({
   const options = isLocal
     ? [
         {
-          label: "Remove & Trash data",
+          label: "移除并删除数据",
           left: "trash-2" as const,
           color: red,
           onPress: () =>
@@ -32,13 +32,13 @@ function RemoveConfirmSheet({
       ]
     : [
         {
-          label: "Remove",
+          label: "移除",
           left: "trash" as const,
           color: red,
           onPress: () => (ids ? remove.mutate({ ids }) : undefined),
         },
         {
-          label: "Remove & Trash data",
+          label: "移除并删除数据",
           left: "trash-2" as const,
           color: red,
           onPress: () =>
@@ -47,7 +47,7 @@ function RemoveConfirmSheet({
       ];
 
   return (
-    <ActionSheet title="Are you sure?" options={options} {...props} />
+    <ActionSheet title="确定吗？" options={options} {...props} />
   );
 }
 

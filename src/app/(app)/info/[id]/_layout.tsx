@@ -100,37 +100,37 @@ function LayoutInner() {
       <MaterialTopTabs.Screen
         name="index"
         options={{
-          title: "Info",
+          title: "信息",
         }}
       />
       <MaterialTopTabs.Screen
         name="settings"
         options={{
-          title: "Settings",
+          title: "设置",
         }}
       />
       <MaterialTopTabs.Screen
         name="files"
         options={{
-          title: "Files",
+          title: "文件",
         }}
       />
       <MaterialTopTabs.Screen
         name="trackers"
         options={{
-          title: "Trackers",
+          title: "Tracker",
         }}
       />
       <MaterialTopTabs.Screen
         name="peers"
         options={{
-          title: "Peers",
+          title: "Peer",
         }}
       />
       <MaterialTopTabs.Screen
         name="pieces"
         options={{
-          title: "Pieces",
+          title: "分块",
         }}
       />
     </MaterialTopTabs>

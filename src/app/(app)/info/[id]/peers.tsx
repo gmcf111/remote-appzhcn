@@ -33,7 +33,7 @@ export default function PeersScreen() {
         ItemSeparatorComponent={Separator}
         ListEmptyComponent={
           <View style={styles.message}>
-            <Text style={styles.title}>No peers found</Text>
+            <Text style={styles.title}>未找到 Peer</Text>
           </View>
         }
       />

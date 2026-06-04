@@ -98,7 +98,7 @@ export default function FilesScreen() {
         ItemSeparatorComponent={Separator}
         ListEmptyComponent={
           <View style={styles.message}>
-            <Text style={styles.title}>No files found</Text>
+            <Text style={styles.title}>未找到文件</Text>
           </View>
         }
       />

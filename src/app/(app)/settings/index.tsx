@@ -29,16 +29,16 @@ type SettingsSection = {
 function getThemeLabel(colorScheme: "system" | "dark" | "light"): string {
   switch (colorScheme) {
     case "system":
-      return "System";
+      return "跟随系统";
     case "dark":
-      return "Dark";
+      return "深色";
     case "light":
-      return "Light";
+      return "浅色";
   }
 }
 
 function getAuthenticationLabel(authentication: boolean): string {
-  return authentication ? "On" : "Off";
+  return authentication ? "开启" : "关闭";
 }
 
 export default function SettingsScreen() {
@@ -46,7 +46,7 @@ export default function SettingsScreen() {
   const colorSchemePreference = useColorSchemePreference();
   const { authentication } = usePreferencesStore();
   const servers = useServers();
-  const { isPro, available } = usePro();
+  const { available } = usePro();
   const { lightGray } = useTheme();
   const router = useRouter();
   const appVersion = getAppVersion();
@@ -65,7 +65,7 @@ export default function SettingsScreen() {
       {
         id: "servers",
         left: "server",
-        label: "Servers",
+        label: "服务器",
         onPress: () => router.push("/settings/servers"),
         showChevron: true,
         variant: "compact",
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
         {
           id: "configuration",
           left: "sliders",
-          label: "Server Configuration",
+          label: "服务器配置",
           onPress: () => router.push("/settings/configuration"),
           showChevron: true,
           variant: "compact",
@@ -85,18 +85,18 @@ export default function SettingsScreen() {
         {
           id: "directories",
           left: "folder",
-          label: "Download Directories",
+          label: "下载目录",
           onPress: () => router.push("/settings/directories"),
           showChevron: true,
           variant: "compact",
         }
       );
 
-      if (available && isPro) {
+      if (available) {
         serverRows.push({
           id: "search",
           left: "search",
-          label: "Search",
+          label: "搜索",
           onPress: () => router.push("/settings/search"),
           showChevron: true,
           variant: "compact",
@@ -108,7 +108,7 @@ export default function SettingsScreen() {
       {
         id: "security",
         left: "lock",
-        label: "Authentication",
+        label: "身份验证",
         value: authenticationLabel,
         onPress: () => router.push("/settings/security"),
         showChevron: true,
@@ -117,7 +117,7 @@ export default function SettingsScreen() {
       {
         id: "theme",
         left: colorScheme === "dark" ? "moon" : "sun",
-        label: "Theme",
+        label: "主题",
         value: themeLabel,
         onPress: () => router.push("/settings/theme"),
         showChevron: true,
@@ -125,24 +125,12 @@ export default function SettingsScreen() {
       },
     ];
 
-    if (available && isPro) {
+    if (available) {
       appRows.push({
         id: "backup",
         left: "download",
-        label: "Configuration Backup",
+        label: "配置备份",
         onPress: () => router.push("/settings/backup"),
-        showChevron: true,
-        variant: "compact",
-      });
-    }
-
-    if (available) {
-      appRows.push({
-        id: "pro",
-        left: "star",
-        label: "Pro",
-        value: isPro ? "Active" : "Upgrade",
-        onPress: () => router.push(isPro ? "/settings/pro" : "/paywall"),
         showChevron: true,
         variant: "compact",
       });
@@ -151,7 +139,7 @@ export default function SettingsScreen() {
     appRows.push({
       id: "about",
       left: "info",
-      label: "About",
+      label: "关于",
       onPress: () => router.push("/settings/about"),
       showChevron: true,
       variant: "compact",
@@ -162,7 +150,7 @@ export default function SettingsScreen() {
           {
             id: "development",
             left: "code",
-            label: "Development",
+            label: "开发",
             onPress: () => router.push("/settings/development"),
             showChevron: true,
             variant: "compact",
@@ -171,12 +159,12 @@ export default function SettingsScreen() {
       : [];
 
     const list: SettingsSection[] = [
-      { key: "server", title: "Server", data: serverRows },
-      { key: "app", title: "App", data: appRows },
+      { key: "server", title: "服务器", data: serverRows },
+      { key: "app", title: "应用", data: appRows },
     ];
 
     if (devRows.length > 0) {
-      list.push({ key: "development", title: "Development", data: devRows });
+      list.push({ key: "development", title: "开发", data: devRows });
     }
 
     return list;
@@ -184,7 +172,6 @@ export default function SettingsScreen() {
     authenticationLabel,
     available,
     colorScheme,
-    isPro,
     router,
     servers.length,
     themeLabel,
@@ -216,7 +203,7 @@ export default function SettingsScreen() {
         }}
         ListFooterComponent={
           <Text color={lightGray} style={styles.version}>
-            Version {appVersion}
+            版本 {appVersion}
           </Text>
         }
       />

@@ -1,14 +1,14 @@
 {
   "name": "@remote-app/app",
   "version": "0.26.6",
-  "description": "A transmission remote session app",
+  "description": "一款 Transmission 远程会话应用",
   "main": "expo-router/entry",
   "author": "Jorge Galat <jrgglt@gmail.com>",
   "license": "MIT",
   "packageManager": "pnpm@11.3.0+sha512.2c403d6594527287672b1f7056343a1f7c3634036a67ffabfcc2b3d7595d843768f8787148d1b57cf7956c90606bbd192857c363af19e96d2d0ec9ec5741d215",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jgalat/remote-app"
+    "url": "https://github.com/gmcf111/remote-appzhcn"
   },
   "scripts": {
     "dev": "expo start",

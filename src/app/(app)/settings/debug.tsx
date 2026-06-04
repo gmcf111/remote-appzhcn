@@ -48,7 +48,7 @@ function Cell({ label, value, color, selectable, maxLines }: {
           {value}
         </Text>
         {clamped && !expanded && (
-          <Text color={gray} style={styles.showMore}>show more</Text>
+          <Text color={gray} style={styles.showMore}>显示更多</Text>
         )}
       </View>
     </Pressable>
@@ -80,10 +80,10 @@ export default function DebugScreen() {
           onPress={() => {
             const lines = [
               `URL: ${params.url}`,
-              params.username ? `Username: ${params.username}` : null,
-              `Error: ${params.errorName}`,
-              params.errorMessage ? `Message: ${params.errorMessage}` : null,
-              errorStatus != null ? `HTTP Status: ${errorStatus}` : null,
+              params.username ? `用户名: ${params.username}` : null,
+              `错误: ${params.errorName}`,
+              params.errorMessage ? `消息: ${params.errorMessage}` : null,
+              errorStatus != null ? `HTTP 状态: ${errorStatus}` : null,
             ].filter(Boolean);
             Share.share({ message: lines.join("\n") });
           }}
@@ -104,18 +104,18 @@ export default function DebugScreen() {
 
   return (
     <Screen variant="scroll" style={styles.screen}>
-      <SettingsSectionTitle title="Request" variant="settings" first />
+      <SettingsSectionTitle title="请求" variant="settings" first />
       <View style={styles.group}>
         <Cell label="URL" value={params.url} selectable />
         {params.username ? (
-          <Cell label="Username" value={params.username} selectable />
+          <Cell label="用户名" value={params.username} selectable />
         ) : null}
         {params.password ? (
           <Pressable
             style={styles.cell}
             onPress={() => setShowPassword((v) => !v)}
           >
-            <Text color={gray} style={styles.cellLabel}>Password</Text>
+            <Text color={gray} style={styles.cellLabel}>密码</Text>
             <View style={styles.passwordValue}>
               <Text selectable={showPassword} style={[styles.cellText, { flex: 1 }]}>
                 {showPassword ? params.password : "\u2022".repeat(params.password.length)}
@@ -130,23 +130,23 @@ export default function DebugScreen() {
         ) : null}
       </View>
 
-      <SettingsSectionTitle title="Error" variant="settings" />
+      <SettingsSectionTitle title="错误" variant="settings" />
       <View style={styles.group}>
-        <Cell label="Type" value={params.errorName} color={red} />
+        <Cell label="类型" value={params.errorName} color={red} />
         {errorStatus != null && (
-          <Cell label="HTTP Status" value={errorStatus} color={red} />
+          <Cell label="HTTP 状态" value={errorStatus} color={red} />
         )}
         {params.errorMessage ? (
-          <Cell label="Message" value={params.errorMessage} selectable maxLines={4} />
+          <Cell label="消息" value={params.errorMessage} selectable maxLines={4} />
         ) : null}
       </View>
 
       {hasBody ? (
         <>
-          <SettingsSectionTitle title="Response" variant="settings" />
+          <SettingsSectionTitle title="响应" variant="settings" />
           <Pressable style={styles.responseRow} onPress={openResponse}>
             <Feather name="file-text" size={16} color={gray} />
-            <Text style={[styles.cellText, { flex: 1 }]}>Open response body</Text>
+            <Text style={[styles.cellText, { flex: 1 }]}>打开响应正文</Text>
             <Feather name="chevron-right" size={18} color={gray} />
           </Pressable>
         </>

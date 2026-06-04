@@ -1,10 +1,8 @@
 # Remote for Transmission
 
+一个用于远程管理 Transmission 和 qBittorrent 下载服务的 React Native 应用客户端。
 
-A React Native application client to remotely control a [Transmission BitTorrent client](https://transmissionbt.com/) instance.
-Transmission is a free and open source lightweight P2P client for the BitTorrent network.
-
-## Screenshots
+## 截图
 
 <p>
   <img src="./.github/screenshots/screenshot-0.jpg" width="150">

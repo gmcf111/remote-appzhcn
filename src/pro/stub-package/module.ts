@@ -1,7 +1,7 @@
 import type { ProModule, EntitlementState } from "~/pro/types";
 
 const stubEntitlement: EntitlementState = {
-  isPro: false,
+  isPro: true,
   source: "stub",
   lastCheckedAt: Date.now(),
 };

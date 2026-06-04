@@ -12,6 +12,7 @@ const versionCode = major * 10_000 + minor * 100 + patch;
 
 const proPackagePath = path.resolve(process.cwd(), "packages/pro/package.json");
 const hasProPackage = fs.existsSync(proPackagePath);
+const easProjectId = process.env.EAS_PROJECT_ID;
 
 const proPlugins: (string | [string, unknown])[] = hasProPackage
   ? ["./packages/pro/plugins/with-torrent-engine.ts"]
@@ -19,9 +20,11 @@ const proPlugins: (string | [string, unknown])[] = hasProPackage
 
 export default {
   name:
-    process.env.APP_ENV === "development" ? "Remote (development)" : "Remote",
-  slug: "remote",
-  owner: "jgalat",
+    process.env.APP_ENV === "development"
+      ? "Remote App 中文版（开发版）"
+      : "Remote App 中文版",
+  slug: "remote-appzhcn",
+  owner: process.env.EXPO_OWNER,
   version: packageJson.version,
   orientation: "portrait",
   icon: "./assets/images/icon.png",
@@ -34,7 +37,7 @@ export default {
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "ar.jg.remote",
+    bundleIdentifier: "cn.gmcf111.remoteappzhcn",
   },
   android: {
     adaptiveIcon: {
@@ -44,8 +47,8 @@ export default {
     },
     package:
       process.env.APP_ENV === "development"
-        ? "ar.jg.remote.dev"
-        : "ar.jg.remote",
+        ? "cn.gmcf111.remoteappzhcn.dev"
+        : "cn.gmcf111.remoteappzhcn",
     versionCode,
     softwareKeyboardLayoutMode: "pan",
   },
@@ -102,8 +105,6 @@ export default {
     typedRoutes: true,
   },
   extra: {
-    eas: {
-      projectId: "583f843d-ee60-4248-bfe8-4d94bddd0ccf",
-    },
+    eas: easProjectId ? { projectId: easProjectId } : undefined,
   },
 } satisfies ExpoConfig;

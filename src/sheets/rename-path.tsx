@@ -76,9 +76,9 @@ function RenamePathSheet({
       gestureEnabled
     >
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-        <Text style={styles.title}>Rename</Text>
+        <Text style={styles.title}>重命名</Text>
         <TextInput
-          placeholder="new name"
+          placeholder="新名称"
           icon={ICON_BY_KIND[kind]}
           value={name}
           onChangeText={setName}
@@ -86,7 +86,7 @@ function RenamePathSheet({
           selectTextOnFocus
         />
         <Button
-          title="rename"
+          title="重命名"
           onPress={onRename}
           disabled={disabled}
           style={styles.button}

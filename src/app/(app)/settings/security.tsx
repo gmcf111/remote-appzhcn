@@ -43,8 +43,8 @@ export default function AuthenticationScreen() {
 
         const { success } = await LocalAuthentication.authenticateAsync({
           promptMessage: nextValue
-            ? "Enable authentication"
-            : "Disable authentication",
+            ? "开启身份验证"
+            : "关闭身份验证",
         });
         if (!success) {
           return;
@@ -62,7 +62,7 @@ export default function AuthenticationScreen() {
     () => [
       {
         left: "lock",
-        label: "On",
+        label: "开启",
         right: authentication ? "check" : undefined,
         onPress: select(true),
         disabled: !available,
@@ -70,7 +70,7 @@ export default function AuthenticationScreen() {
       },
       {
         left: "unlock",
-        label: "Off",
+        label: "关闭",
         right: !authentication ? "check" : undefined,
         onPress: select(false),
         disabled: !available,

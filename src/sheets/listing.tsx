@@ -64,15 +64,15 @@ function ListingSheet(_: SheetProps<typeof LISTING_SHEET_ID>) {
 
   const sortOptions = React.useMemo<OptionProps[]>(
     () => [
-      { label: "Queue", left: "chevron-right", onPress: updateSort("queue"), right: sortRight("queue") },
-      { label: "Activity", left: "chevron-right", onPress: updateSort("activity"), right: sortRight("activity") },
-      { label: "Age", left: "chevron-right", onPress: updateSort("age"), right: sortRight("age") },
-      { label: "Name", left: "chevron-right", onPress: updateSort("name"), right: sortRight("name") },
-      { label: "Progress", left: "chevron-right", onPress: updateSort("progress"), right: sortRight("progress") },
-      { label: "Size", left: "chevron-right", onPress: updateSort("size"), right: sortRight("size") },
-      { label: "Status", left: "chevron-right", onPress: updateSort("status"), right: sortRight("status") },
-      { label: "Time Remaining", left: "chevron-right", onPress: updateSort("time-remaining"), right: sortRight("time-remaining") },
-      { label: "Ratio", left: "chevron-right", onPress: updateSort("ratio"), right: sortRight("ratio") },
+      { label: "队列", left: "chevron-right", onPress: updateSort("queue"), right: sortRight("queue") },
+      { label: "活动", left: "chevron-right", onPress: updateSort("activity"), right: sortRight("activity") },
+      { label: "时间", left: "chevron-right", onPress: updateSort("age"), right: sortRight("age") },
+      { label: "名称", left: "chevron-right", onPress: updateSort("name"), right: sortRight("name") },
+      { label: "进度", left: "chevron-right", onPress: updateSort("progress"), right: sortRight("progress") },
+      { label: "大小", left: "chevron-right", onPress: updateSort("size"), right: sortRight("size") },
+      { label: "状态", left: "chevron-right", onPress: updateSort("status"), right: sortRight("status") },
+      { label: "剩余时间", left: "chevron-right", onPress: updateSort("time-remaining"), right: sortRight("time-remaining") },
+      { label: "分享率", left: "chevron-right", onPress: updateSort("ratio"), right: sortRight("ratio") },
     ],
     [updateSort, sortRight]
   );
@@ -99,19 +99,19 @@ function ListingSheet(_: SheetProps<typeof LISTING_SHEET_ID>) {
 
   const filterOptions = React.useMemo<OptionProps[]>(
     () => [
-      { label: "All", left: filterLeft("all"), onPress: updateFilter("all"), right: filterRight("all") },
-      { label: "Active", left: filterLeft("active"), onPress: updateFilter("active"), right: filterRight("active") },
-      { label: "Downloading", left: filterLeft("downloading"), onPress: updateFilter("downloading"), right: filterRight("downloading") },
-      { label: "Seeding", left: filterLeft("seeding"), onPress: updateFilter("seeding"), right: filterRight("seeding") },
-      { label: "Paused", left: filterLeft("paused"), onPress: updateFilter("paused"), right: filterRight("paused") },
-      { label: "Completed", left: filterLeft("completed"), onPress: updateFilter("completed"), right: filterRight("completed") },
-      { label: "Finished", left: filterLeft("finished"), onPress: updateFilter("finished"), right: filterRight("finished") },
+      { label: "全部", left: filterLeft("all"), onPress: updateFilter("all"), right: filterRight("all") },
+      { label: "活动", left: filterLeft("active"), onPress: updateFilter("active"), right: filterRight("active") },
+      { label: "下载中", left: filterLeft("downloading"), onPress: updateFilter("downloading"), right: filterRight("downloading") },
+      { label: "做种中", left: filterLeft("seeding"), onPress: updateFilter("seeding"), right: filterRight("seeding") },
+      { label: "已暂停", left: filterLeft("paused"), onPress: updateFilter("paused"), right: filterRight("paused") },
+      { label: "已完成", left: filterLeft("completed"), onPress: updateFilter("completed"), right: filterRight("completed") },
+      { label: "已结束", left: filterLeft("finished"), onPress: updateFilter("finished"), right: filterRight("finished") },
     ],
     [filterLeft, updateFilter, filterRight]
   );
 
   const defaultDir = session?.["download-dir"];
-  const pathLabel = pathFilter || "Path";
+  const pathLabel = pathFilter || "路径";
 
   const openPathPicker = React.useCallback(() => {
     const dirs = new Set<string>();
@@ -128,7 +128,7 @@ function ListingSheet(_: SheetProps<typeof LISTING_SHEET_ID>) {
     const options: SelectOption[] = [
       {
         value: "",
-        label: "All",
+        label: "全部",
         left: torrents?.length ?? 0,
         right: pathFilter === "" ? "check" : undefined,
       },
@@ -142,7 +142,7 @@ function ListingSheet(_: SheetProps<typeof LISTING_SHEET_ID>) {
 
     SheetManager.show(SELECT_SHEET_ID, {
       payload: {
-        title: "Path",
+        title: "路径",
         options,
         onSelect: (value: string | number) => {
           store({ pathFilter: String(value) });
@@ -185,7 +185,7 @@ function ListingSheet(_: SheetProps<typeof LISTING_SHEET_ID>) {
                   { color: tab === t ? background : text },
                 ]}
               >
-                {t === "sort" ? "Sort" : "Filter"}
+                {t === "sort" ? "排序" : "筛选"}
               </Text>
             </Pressable>
           ))}

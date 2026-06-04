@@ -147,7 +147,7 @@ const storage: {
           lastAnnounceTime: 1761505577,
           lastAnnounceSucceeded: true,
           lastAnnouncePeerCount: 31,
-          lastAnnounceResult: "Success",
+          lastAnnounceResult: "成功",
           nextAnnounceTime: 0,
           lastScrapeTime: 1761505577,
           lastScrapeSucceeded: true,

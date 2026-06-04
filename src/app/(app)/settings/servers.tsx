@@ -15,7 +15,6 @@ import {
 } from "~/components/settings";
 import { useTheme } from "~/hooks/use-theme-color";
 import { useServersStore } from "~/hooks/use-settings";
-import { usePro } from "@remote-app/pro";
 import type { Server } from "~/store/settings";
 import { useServerDeleteConfirmSheet } from "~/hooks/use-action-sheet";
 import { useHealthPing, type HealthStatus } from "~/hooks/torrent";
@@ -100,7 +99,6 @@ function ServerRow({
 export default function ServersScreen() {
   const router = useRouter();
   const { servers } = useServersStore();
-  const { isPro, available } = usePro();
   const { gray, red, text } = useTheme();
   const { statuses: health, refetch, isFetching } = useHealthPing(servers);
   const deleteSheet = useServerDeleteConfirmSheet();
@@ -139,26 +137,22 @@ export default function ServersScreen() {
     const ids = [...selectedIds];
     const label =
       ids.length === 1
-        ? servers.find((s) => s.id === ids[0])?.name ?? "server"
-        : `${ids.length} servers`;
+        ? servers.find((s) => s.id === ids[0])?.name ?? "服务器"
+        : `${ids.length} 个服务器`;
     deleteSheet({ ids, label });
     clearSelection();
   }, [selectedIds, servers, deleteSheet, clearSelection]);
 
   const onAdd = React.useCallback(() => {
-    if (servers.length === 0 || (available && isPro)) {
-      router.push("/settings/connection");
-    } else if (available) {
-      router.push("/paywall");
-    }
-  }, [servers.length, available, isPro, router]);
+    router.push("/settings/connection");
+  }, [router]);
 
   return (
     <Screen>
       {servers.length === 0 ? (
         <View style={styles.empty}>
           <Text color={gray} style={styles.emptyText}>
-            No servers configured
+            尚未配置服务器
           </Text>
         </View>
       ) : (
@@ -197,23 +191,21 @@ export default function ServersScreen() {
       {selectionActive ? (
         <View style={styles.footer}>
           <Button
-            title={`Delete Selected (${selectedIds.size})`}
+            title={`删除所选项 (${selectedIds.size})`}
             onPress={onDeleteSelected}
             style={{ backgroundColor: red }}
           />
           <Button
-            title="Cancel"
+            title="取消"
             variant="outline"
             onPress={clearSelection}
             style={{ marginTop: 8 }}
           />
         </View>
       ) : (
-        (available || servers.length === 0) && (
-          <View style={styles.footer}>
-            <Button title="Add Server" onPress={onAdd} />
-          </View>
-        )
+        <View style={styles.footer}>
+          <Button title="添加服务器" onPress={onAdd} />
+        </View>
       )}
     </Screen>
   );

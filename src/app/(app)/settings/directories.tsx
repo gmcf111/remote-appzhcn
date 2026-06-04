@@ -79,7 +79,7 @@ function DirectoryRow({
           {entry.path}
         </Text>
         <Text style={[styles.rowTag, { color: gray }]}>
-          {entry.isDefault ? "default" : entry.isGlobal ? "global" : "server"}
+          {entry.isDefault ? "默认" : entry.isGlobal ? "全局" : "服务器"}
         </Text>
       </View>
       {!selectionActive && (
@@ -214,12 +214,12 @@ function DirectoriesList({ server }: { server: Server }) {
       {selectionActive ? (
         <View style={styles.footer}>
           <Button
-            title={`Delete Selected (${selectedPaths.size})`}
+            title={`删除所选项 (${selectedPaths.size})`}
             onPress={onDeleteSelected}
             style={{ backgroundColor: red }}
           />
           <Button
-            title="Cancel"
+            title="取消"
             variant="outline"
             onPress={clearSelection}
             style={{ marginTop: 8 }}
@@ -228,7 +228,7 @@ function DirectoriesList({ server }: { server: Server }) {
       ) : isLocal ? null : (
         <View style={styles.footer}>
           <Button
-            title="Add Directory"
+            title="添加目录"
             onPress={() =>
               router.push(`/settings/directory?serverId=${server.id}`)
             }
@@ -263,7 +263,7 @@ export default function DirectoriesScreen() {
 
     SheetManager.show(SELECT_SHEET_ID, {
       payload: {
-        title: "Select server",
+        title: "选择服务器",
         options,
         onSelect: (value) => setSelectedId(String(value)),
       },
@@ -273,7 +273,7 @@ export default function DirectoriesScreen() {
   if (servers.length === 0) {
     return (
       <Screen>
-        <Text>No servers configured</Text>
+        <Text>尚未配置服务器</Text>
       </Screen>
     );
   }
@@ -283,7 +283,7 @@ export default function DirectoriesScreen() {
       {servers.length > 1 && (
         <Pressable style={styles.serverSelector} onPress={onPickServer}>
           <Feather name="server" size={16} color={text} />
-          <Text style={styles.serverName}>{server?.name ?? "Select server"}</Text>
+          <Text style={styles.serverName}>{server?.name ?? "选择服务器"}</Text>
           <Feather name="chevron-down" size={16} color={text} />
         </Pressable>
       )}

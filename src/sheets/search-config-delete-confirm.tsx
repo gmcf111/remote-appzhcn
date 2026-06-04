@@ -24,10 +24,10 @@ function SearchConfigDeleteConfirmSheet({
 
   return (
     <ActionSheet
-      title={`Delete ${payload?.label ?? "search config"}?`}
+      title={`删除 ${payload?.label ?? "搜索配置"}？`}
       options={[
         {
-          label: "Delete",
+          label: "删除",
           left: "trash",
           color: red,
           onPress: onDelete,

@@ -22,23 +22,23 @@ function TorrentPrioritySheet({
 
   const options: OptionProps[] = [
     {
-      label: "High",
+      label: "高",
       left: "chevrons-up",
       onPress: () => torrentSet.mutate({ "priority-high": content }),
     },
     {
-      label: "Normal",
+      label: "普通",
       left: "minus",
       onPress: () => torrentSet.mutate({ "priority-normal": content }),
     },
     {
-      label: "Low",
+      label: "低",
       left: "chevrons-down",
       onPress: () => torrentSet.mutate({ "priority-low": content }),
     },
   ];
 
-  return <ActionSheet title="Priority" options={options} {...props} />;
+  return <ActionSheet title="优先级" options={options} {...props} />;
 }
 
 TorrentPrioritySheet.sheetId = TORRENT_PRIORITY_SHEET_ID;

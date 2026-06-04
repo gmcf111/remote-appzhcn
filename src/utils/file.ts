@@ -90,10 +90,10 @@ export function getNode(root: Node, path: string): Node | undefined {
 
 export function getPriority(
   files: File[]
-): "Low" | "Normal" | "High" | "Mixed" {
-  if (files.length === 0) return "Normal";
-  if (files.every((f) => f.priority === Priority.LOW)) return "Low";
-  if (files.every((f) => f.priority === Priority.NORMAL)) return "Normal";
-  if (files.every((f) => f.priority === Priority.HIGH)) return "High";
-  return "Mixed";
+): "低" | "普通" | "高" | "混合" {
+  if (files.length === 0) return "普通";
+  if (files.every((f) => f.priority === Priority.LOW)) return "低";
+  if (files.every((f) => f.priority === Priority.NORMAL)) return "普通";
+  if (files.every((f) => f.priority === Priority.HIGH)) return "高";
+  return "混合";
 }

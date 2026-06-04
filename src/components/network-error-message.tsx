@@ -32,20 +32,20 @@ export default React.memo(function NetworkErrorMessage({
   const { red } = useTheme();
   const server = useServer();
 
-  let title = "Failed to connect";
-  let message = error.message || "Unknown error";
+  let title = "连接失败";
+  let message = error.message || "未知错误";
 
   if (hasStatus(error)) {
-    title = error.message ? `${error.status}: ${error.message}` : `HTTP Status ${error.status}`;
+    title = error.message ? `${error.status}: ${error.message}` : `HTTP 状态 ${error.status}`;
     message = "";
   }
 
   if (error.name === "TransmissionError" || error.name === "QBittorrentError") {
-    title = "Server Error";
+    title = "服务器错误";
   }
 
   if (hasBody(error) && !hasStatus(error)) {
-    title = "Unexpected response";
+    title = "意外响应";
     message = "";
   }
 
@@ -81,14 +81,14 @@ export default React.memo(function NetworkErrorMessage({
                 : "/settings/connection",
             )
           }
-          title="Connection Settings"
+          title="连接设置"
         />
         <Button
           onPress={() => startActivityAsync(ActivityAction.WIFI_SETTINGS)}
-          title="Network Settings"
+          title="网络设置"
         />
-        <Button onPress={onDebug} title="Debug" />
-        <Button onPress={refetch} title="Retry" />
+        <Button onPress={onDebug} title="调试" />
+        <Button onPress={refetch} title="重试" />
       </View>
     </View>
   );

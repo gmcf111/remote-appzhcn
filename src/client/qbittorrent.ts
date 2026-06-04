@@ -158,11 +158,11 @@ function mapTrackers(qTrackers: TorrentTracker[]): TorrentTrackersDetail {
       lastAnnounceTime: 0,
       lastAnnounceSucceeded: t.status >= 2,
       lastAnnouncePeerCount: t.num_peers,
-      lastAnnounceResult: t.msg || "OK",
+      lastAnnounceResult: t.msg || "成功",
       nextAnnounceTime: 0,
       lastScrapeTime: 0,
       lastScrapeSucceeded: t.status >= 2,
-      lastScrapeResult: t.msg || "OK",
+      lastScrapeResult: t.msg || "成功",
       nextScrapeTime: 0,
       scrape: "",
     }));
@@ -270,7 +270,7 @@ export class QBittorrentAdapter implements TorrentClient {
     if (params.metainfo) {
       const cacheDir = FileSystem.cacheDirectory;
       if (!cacheDir) {
-        throw new Error("Cache directory is unavailable");
+        throw new Error("缓存目录不可用");
       }
 
       tempPath = `${cacheDir}upload-${Date.now()}-${randomUUID()}.torrent`;

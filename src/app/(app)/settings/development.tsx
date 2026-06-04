@@ -12,7 +12,7 @@ import { SettingsSectionTitle } from "~/components/settings";
 import TorrentsNotifierTask from "~/tasks/torrents-notifier";
 import { useServersStore, useSearchStore } from "~/hooks/use-settings";
 import { useTheme } from "~/hooks/use-theme-color";
-import { usePro, getAppId, generateAppId } from "@remote-app/pro";
+import { getAppId, generateAppId } from "@remote-app/pro";
 import { generateServerId } from "~/store/settings";
 import { storage } from "~/store/storage";
 import { debugHref } from "~/lib/debug-href";
@@ -48,7 +48,7 @@ function StorageInspector() {
 
   return (
     <View>
-      <SettingsSectionTitle title="Storage" variant="settings" />
+      <SettingsSectionTitle title="存储" variant="settings" />
       {keys.map((key) => {
         const isExpanded = expanded.has(key);
         const value = storage.getString(key);
@@ -75,12 +75,12 @@ function StorageInspector() {
       })}
       {keys.length === 0 && (
         <Text color={lightGray} style={styles.emptyText}>
-          No keys stored
+          没有已存储的键
         </Text>
       )}
       {keys.length > 0 && (
         <Pressable style={styles.clearAll} onPress={clearAll}>
-          <Text color="red">Clear All</Text>
+          <Text color="red">全部清除</Text>
         </Pressable>
       )}
     </View>
@@ -99,7 +99,6 @@ export default function Development() {
   const router = useRouter();
   const { store } = useServersStore();
   const { store: storeSearch } = useSearchStore();
-  const { devOverride, setDevOverride } = usePro();
   const [appId, setAppId] = React.useState(() => getAppId());
 
   const sections = React.useMemo<DevSection[]>(() => {
@@ -107,7 +106,7 @@ export default function Development() {
       {
         id: "sitemap",
         left: "map",
-        label: "Sitemap",
+        label: "站点地图",
         showChevron: true,
         variant: "compact",
         onPress: () => router.push("/_sitemap"),
@@ -118,7 +117,7 @@ export default function Development() {
       {
         id: "task",
         left: "play",
-        label: "Background Task",
+        label: "后台任务",
         variant: "compact",
         onPress: async () => {
           const result = await TorrentsNotifierTask();
@@ -128,14 +127,14 @@ export default function Development() {
       {
         id: "notification",
         left: "bell",
-        label: "Test Notification",
+        label: "测试通知",
         variant: "compact",
         onPress: async () => {
           await Notifications.requestPermissionsAsync();
           await Notifications.scheduleNotificationAsync({
             content: {
-              title: "Test notification",
-              body: "This is a test notification",
+              title: "测试通知",
+              body: "这是一条测试通知",
             },
             trigger: null,
           });
@@ -144,7 +143,7 @@ export default function Development() {
       {
         id: "debug",
         left: "alert-triangle",
-        label: "Test Debug Screen",
+        label: "测试调试页面",
         showChevron: true,
         variant: "compact",
         onPress: () => {
@@ -153,22 +152,11 @@ export default function Development() {
             username: "admin",
             password: "hunter2",
             errorName: "HTTPError",
-            errorMessage: "<!DOCTYPE html><html><head><title>401 Unauthorized</title></head><body><h1>401 Unauthorized</h1><p>This server could not verify that you are authorized to access the document requested. Either you supplied the wrong credentials (e.g., bad password), or your browser doesn't understand how to supply the credentials required.</p><p>Additionally, a 401 Unauthorized error was encountered while trying to use an ErrorDocument to handle the request.</p><hr><address>Apache/2.4.41 (Ubuntu) Server at my-server.example.com Port 9091</address></body></html>",
+            errorMessage: "<!DOCTYPE html><html><head><title>401 未授权</title></head><body><h1>401 未授权</h1><p>此服务器无法验证你是否有权访问请求的文档。可能是你提供了错误的凭据（例如密码错误），也可能是浏览器不知道如何提供所需凭据。</p><p>此外，在尝试使用 ErrorDocument 处理请求时遇到了 401 未授权错误。</p><hr><address>Apache/2.4.41 (Ubuntu) 服务器 my-server.example.com 端口 9091</address></body></html>",
             errorStatus: 401,
-            errorBody: "<html><body><h1>401 Unauthorized</h1></body></html>",
+            errorBody: "<html><body><h1>401 未授权</h1></body></html>",
           }));
         },
-      },
-    ];
-
-    const pro: OptionProps[] = [
-      {
-        id: "pro-override",
-        left: "star",
-        label: "Pro Override",
-        value: devOverride ? "On" : "Off",
-        variant: "compact",
-        onPress: () => setDevOverride(!devOverride),
       },
     ];
 
@@ -176,7 +164,7 @@ export default function Development() {
       {
         id: "mock",
         left: "radio",
-        label: "Mock Server",
+        label: "模拟服务器",
         variant: "compact",
         onPress: () => {
           const now = Date.now();
@@ -190,7 +178,7 @@ export default function Development() {
       {
         id: "local-transmission",
         left: "hard-drive",
-        label: "Local Transmission",
+        label: "本地 Transmission",
         variant: "compact",
         onPress: () => {
           const now = Date.now();
@@ -213,7 +201,7 @@ export default function Development() {
       {
         id: "local-qbittorrent",
         left: "hard-drive",
-        label: "Local qBittorrent",
+        label: "本地 qBittorrent",
         variant: "compact",
         onPress: () => {
           const now = Date.now();
@@ -239,7 +227,7 @@ export default function Development() {
       {
         id: "search-jackett",
         left: "search",
-        label: "Jackett (test)",
+        label: "Jackett（测试）",
         variant: "compact",
         onPress: () =>
           storeSearch({
@@ -251,7 +239,7 @@ export default function Development() {
       {
         id: "search-prowlarr",
         left: "search",
-        label: "Prowlarr (test)",
+        label: "Prowlarr（测试）",
         variant: "compact",
         onPress: () =>
           storeSearch({
@@ -266,21 +254,20 @@ export default function Development() {
       {
         id: "regenerate-appid",
         left: "refresh-cw",
-        label: "Regenerate",
+        label: "重新生成",
         variant: "compact",
         onPress: () => setAppId(generateAppId()),
       },
     ];
 
     return [
-      { key: "navigation", title: "Navigation", data: navigation },
-      { key: "actions", title: "Actions", data: actions },
-      { key: "pro", title: "Pro", data: pro },
-      { key: "servers", title: "Servers", data: servers },
-      { key: "search", title: "Search", data: search },
-      { key: "appid", title: "App ID", data: appIdSection },
+      { key: "navigation", title: "导航", data: navigation },
+      { key: "actions", title: "操作", data: actions },
+      { key: "servers", title: "服务器", data: servers },
+      { key: "search", title: "搜索", data: search },
+      { key: "appid", title: "应用 ID", data: appIdSection },
     ];
-  }, [devOverride, router, setDevOverride, store, storeSearch]);
+  }, [router, store, storeSearch]);
 
   return (
     <Screen style={styles.screen}>

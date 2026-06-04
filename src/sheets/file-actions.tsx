@@ -32,7 +32,7 @@ function FileActionsSheet({
 
   const options: OptionProps[] = [
     {
-      label: "Set priority",
+      label: "设置优先级",
       left: "bar-chart-2",
       onPress: () => {
         setTimeout(
@@ -53,7 +53,7 @@ function FileActionsSheet({
       ? []
       : [
           {
-            label: "Rename",
+            label: "重命名",
             left: "edit-2" as const,
             onPress: () => {
               setTimeout(

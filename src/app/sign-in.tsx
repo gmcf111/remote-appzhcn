@@ -27,14 +27,14 @@ export default function SignIn() {
           source={icon}
           style={styles.icon}
         />
-        <Text style={styles.title}>Remote for Transmission</Text>
-        <Text style={styles.subtitle}>Unlock to continue</Text>
+        <Text style={styles.title}>Transmission 远程管理</Text>
+        <Text style={styles.subtitle}>解锁以继续</Text>
       </View>
       <View style={footerStyle}>
         <Button
           style={styles.button}
           onPress={() => unlock(href)}
-          title="Authenticate"
+          title="身份验证"
         />
       </View>
     </Screen>

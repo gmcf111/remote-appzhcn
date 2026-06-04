@@ -49,12 +49,12 @@ const Form = z
       ctx.addIssue({
         path: ["magnet"],
         code: z.ZodIssueCode.custom,
-        message: "either magnet or file is required",
+        message: "请输入 Magnet 链接或选择 Torrent 文件",
       });
       ctx.addIssue({
         path: ["file"],
         code: z.ZodIssueCode.custom,
-        message: "either magnet or file is required",
+        message: "请输入 Magnet 链接或选择 Torrent 文件",
       });
     }
   });
@@ -137,8 +137,8 @@ export default function AddTorrentScreen() {
     const message =
       sharedTorrent.error instanceof Error
         ? sharedTorrent.error.message
-        : "Unknown error";
-    ToastAndroid.show(`Failed to read shared file: ${message}`, ToastAndroid.SHORT);
+        : "未知错误";
+    ToastAndroid.show(`读取共享文件失败：${message}`, ToastAndroid.SHORT);
   }, [sharedTorrent.error]);
 
   const onPickDirectory = React.useCallback(() => {
@@ -158,7 +158,7 @@ export default function AddTorrentScreen() {
 
     SheetManager.show(SELECT_SHEET_ID, {
       payload: {
-        title: "Select directory",
+        title: "选择目录",
         options,
         onSelect: (value) => setValue("path", String(value)),
       },
@@ -202,7 +202,7 @@ export default function AddTorrentScreen() {
         // app-scoped Downloads dir).
         const trimmedPath = (f.path ?? "").trim();
         if (!isLocal && trimmedPath.length === 0) {
-          ToastAndroid.show("path is required", ToastAndroid.SHORT);
+          ToastAndroid.show("请输入路径", ToastAndroid.SHORT);
           return;
         }
 
@@ -226,12 +226,12 @@ export default function AddTorrentScreen() {
         await addTorrent.mutateAsync(params);
         goBack();
       } catch (e) {
-        let message = "Something went wrong";
+        let message = "出了点问题";
         if (e instanceof Error) {
           message = e.message;
         }
         ToastAndroid.show(
-          `Failed to add torrent: ${message}`,
+          `添加种子失败：${message}`,
           ToastAndroid.SHORT
         );
       }
@@ -251,7 +251,7 @@ export default function AddTorrentScreen() {
           control={control}
           render={({ field, fieldState }) => (
             <SettingsFieldRow
-              label="Magnet link"
+              label="Magnet 链接"
               error={fieldState.error?.message}
               reserveErrorSpace
             >
@@ -276,7 +276,7 @@ export default function AddTorrentScreen() {
           control={control}
           render={({ field, fieldState }) => (
             <SettingsFieldRow
-              label="Torrent file"
+              label="Torrent 文件"
               error={fieldState.error?.message}
               reserveErrorSpace
             >
@@ -285,7 +285,7 @@ export default function AddTorrentScreen() {
                 title={
                   field.value && field.value.length > 24
                     ? field.value.slice(0, 24) + "..."
-                    : field.value || "or select a .torrent file"
+                    : field.value || "或选择 .torrent 文件"
                 }
                 style={fieldState.error ? { borderColor: red } : undefined}
                 titleStyle={field.value ? { color: text } : undefined}
@@ -301,7 +301,7 @@ export default function AddTorrentScreen() {
             control={control}
             render={({ field, fieldState }) => (
               <SettingsFieldRow
-                label="Download path"
+                label="下载路径"
                 error={fieldState.error?.message}
                 reserveErrorSpace
               >
@@ -340,8 +340,8 @@ export default function AddTorrentScreen() {
             render={({ field }) => (
               <Toggle
                 variant="settings"
-                label="Start automatically"
-                description="Begin downloading immediately after adding."
+                label="自动开始"
+                description="添加后立即开始下载。"
                 value={field.value}
                 onPress={field.onChange}
               />
@@ -353,11 +353,11 @@ export default function AddTorrentScreen() {
 
       <View style={styles.footer}>
         <Button
-          title="add torrent"
+          title="添加种子"
           onPress={handleSubmit(onSubmit)}
         />
         <Button
-          title="cancel"
+          title="取消"
           variant="outline"
           onPress={goBack}
           style={{ marginTop: 8 }}

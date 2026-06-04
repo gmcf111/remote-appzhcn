@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import ActionSheet, { SheetProps } from "~/components/action-sheet";
 import { useServersStore, useServer } from "~/hooks/use-settings";
 import {
-  usePro,
   useLocalEngineStatus,
   useResumeLocalEngine,
   LOCAL_SERVER_ID,
@@ -15,7 +14,6 @@ import { SERVER_SELECTOR_SHEET_ID } from "./ids";
 function ServerSelectorSheet(props: SheetProps<typeof SERVER_SELECTOR_SHEET_ID>) {
   const router = useRouter();
   const { servers, store } = useServersStore();
-  const { isPro, available } = usePro();
   const active = useServer();
   const engineStatus = useLocalEngineStatus();
   const { mutate: resumeLocalEngine } = useResumeLocalEngine();
@@ -38,28 +36,19 @@ function ServerSelectorSheet(props: SheetProps<typeof SERVER_SELECTOR_SHEET_ID>)
     const head: OptionProps[] = [];
     if (localActive && engineStopped) {
       head.push({
-        label: "Start local service",
+        label: "启动本地服务",
         left: "play" as const,
         onPress: () => resumeLocalEngine(undefined),
       });
-    }
-
-    const canAdd = servers.length === 0 || isPro;
-
-    if (!available && servers.length > 0) {
-      return [...head, ...serverOptions];
     }
 
     return [
       ...head,
       ...serverOptions,
       {
-        label: "Add Server",
+        label: "添加服务器",
         left: "plus" as const,
-        onPress: () =>
-          canAdd
-            ? router.push("/settings/connection")
-            : router.push("/paywall"),
+        onPress: () => router.push("/settings/connection"),
       },
     ];
   }, [
@@ -67,14 +56,12 @@ function ServerSelectorSheet(props: SheetProps<typeof SERVER_SELECTOR_SHEET_ID>)
     active?.id,
     store,
     router,
-    available,
-    isPro,
     engineStatus.available,
     engineStatus.state,
     resumeLocalEngine,
   ]);
 
-  return <ActionSheet title="Servers" options={options} {...props} />;
+  return <ActionSheet title="服务器" options={options} {...props} />;
 }
 
 ServerSelectorSheet.sheetId = SERVER_SELECTOR_SHEET_ID;

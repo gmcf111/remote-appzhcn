@@ -14,17 +14,17 @@ export const unstable_settings = {
 export default function AppLayout() {
   const opts = useScreenOptions();
   const router = useRouter();
-  const { available, isPro } = usePro();
+  const { available } = usePro();
 
   return (
     <TorrentSelectionProvider>
       <SheetProvider>
         <Stack screenOptions={opts}>
-          <Stack.Screen name="index" options={{ title: "Remote" }} />
+          <Stack.Screen name="index" options={{ title: "远程" }} />
           <Stack.Screen
             name="info/[id]"
             options={{
-              title: "Details",
+              title: "详情",
               headerLeft: () => (
                 <ActionIcon
                   name="arrow-left"
@@ -37,69 +37,69 @@ export default function AppLayout() {
           <Stack.Screen
             name="add"
             options={{
-              title: "Add torrent",
+              title: "添加种子",
             }}
           />
-          <Stack.Protected guard={available && isPro}>
+          <Stack.Protected guard={available}>
             <Stack.Screen
               name="search"
-              options={{ title: "Search" }}
+              options={{ title: "搜索" }}
             />
           </Stack.Protected>
           <Stack.Screen
             name="paywall"
             options={{
               presentation: "modal",
-              title: "Pro",
+              title: "已解锁",
             }}
           />
-          <Stack.Screen name="settings/index" options={{ title: "Settings" }} />
+          <Stack.Screen name="settings/index" options={{ title: "设置" }} />
           <Stack.Screen
             name="settings/servers"
-            options={{ title: "Servers" }}
+            options={{ title: "服务器" }}
           />
           <Stack.Screen
             name="settings/connection"
-            options={{ title: "Server" }}
+            options={{ title: "服务器" }}
           />
           <Stack.Screen
             name="settings/configuration"
-            options={{ title: "Server Configuration" }}
+            options={{ title: "服务器配置" }}
           />
           <Stack.Screen
             name="settings/security"
-            options={{ title: "Authentication" }}
+            options={{ title: "身份验证" }}
           />
-          <Stack.Screen name="settings/theme" options={{ title: "Theme" }} />
-          <Stack.Screen name="settings/about" options={{ title: "About" }} />
+          <Stack.Screen name="settings/theme" options={{ title: "主题" }} />
+          <Stack.Screen name="settings/about" options={{ title: "关于" }} />
           <Stack.Screen
             name="settings/pro"
-            options={{ title: "Pro" }}
+            options={{ title: "已解锁" }}
           />
-          <Stack.Protected guard={available && isPro}>
+          <Stack.Protected guard={available}>
             <Stack.Screen
               name="settings/search"
-              options={{ title: "Search" }}
+              options={{ title: "搜索" }}
             />
             <Stack.Screen
               name="settings/backup"
-              options={{ title: "Configuration Backup" }}
+              options={{ title: "配置备份" }}
             />
           </Stack.Protected>
-          <Stack.Screen name="settings/app-id" options={{ title: "App ID" }} />
-          <Stack.Screen name="settings/debug" options={{ title: "Debug" }} />
+          <Stack.Screen name="settings/app-id" options={{ title: "应用 ID" }} />
+          <Stack.Screen name="settings/debug" options={{ title: "调试" }} />
           <Stack.Screen
             name="settings/directories"
-            options={{ title: "Download Directories" }}
+            options={{ title: "下载目录" }}
           />
           <Stack.Screen
             name="settings/directory"
-            options={{ title: "Directory" }}
+            options={{ title: "目录" }}
           />
           {__DEV__ && (
             <Stack.Screen
               name="settings/development"
-              options={{ title: "Development" }}
+              options={{ title: "开发" }}
             />
           )}
         </Stack>

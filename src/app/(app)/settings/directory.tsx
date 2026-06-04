@@ -20,16 +20,15 @@ import {
 } from "~/hooks/use-settings";
 import { useServerSessionSet } from "~/hooks/torrent";
 import { useTheme } from "~/hooks/use-theme-color";
-import { usePro } from "@remote-app/pro";
 
 type Form = z.infer<typeof Form>;
 const Form = z.object({
   path: z
     .string()
-    .min(1, "path cannot be empty")
+    .min(1, "路径不能为空")
     .regex(
       /^([a-zA-Z]:\\|\/)([^<>:"|?*\n\r]+(\/|\\)?)*$/,
-      "invalid path format"
+      "路径格式无效"
     ),
   global: z.boolean(),
 });
@@ -51,12 +50,11 @@ export default function DirectoryScreen() {
   const { mutate: setSession } = useServerSessionSet(server);
   const { directories, store } = useDirectoriesStore();
 
-  const { isPro } = usePro();
   const isLocal = server?.type === "local";
   // Local-engine directories are device-specific filesystem paths — sharing
   // them across remote servers makes no sense, so the global toggle is
   // hidden for the local server.
-  const showGlobal = !isDefault && isPro && !isLocal;
+  const showGlobal = !isDefault && !isLocal;
 
   const isDefaultDir = isDefault === "true";
   const isNew = !initialPath;
@@ -108,11 +106,11 @@ export default function DirectoryScreen() {
           { "download-dir": trimmed },
           {
             onSuccess: () => {
-              ToastAndroid.show("Default directory updated", ToastAndroid.SHORT);
+              ToastAndroid.show("默认目录已更新", ToastAndroid.SHORT);
               router.back();
             },
             onError: () => {
-              ToastAndroid.show("Failed to update", ToastAndroid.SHORT);
+              ToastAndroid.show("更新失败", ToastAndroid.SHORT);
             },
           }
         );
@@ -165,7 +163,7 @@ export default function DirectoryScreen() {
   if (!server) {
     return (
       <Screen>
-        <Text>Server not found</Text>
+        <Text>未找到服务器</Text>
       </Screen>
     );
   }
@@ -182,7 +180,7 @@ export default function DirectoryScreen() {
           name="path"
           control={control}
           render={({ field, fieldState }) => (
-            <SettingsFieldRow label="Path" error={fieldState.error?.message}>
+            <SettingsFieldRow label="路径" error={fieldState.error?.message}>
               <TextInput
                 variant="settings"
                 placeholder="/downloads"
@@ -204,8 +202,8 @@ export default function DirectoryScreen() {
               render={({ field }) => (
                 <Toggle
                   variant="settings"
-                  label="Global"
-                  description="Share this directory across all servers."
+                  label="全局"
+                  description="在所有服务器之间共享此目录。"
                   value={field.value}
                   onPress={field.onChange}
                 />
@@ -215,7 +213,7 @@ export default function DirectoryScreen() {
         )}
 
         <Button
-          title="save"
+          title="保存"
           onPress={handleSubmit(onSubmit)}
         />
       </KeyboardAwareScrollView>

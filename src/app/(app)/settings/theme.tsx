@@ -31,21 +31,21 @@ export default function ThemeScreen() {
     () => [
       {
         left: "smartphone",
-        label: "System default",
+        label: "跟随系统",
         right: colorScheme === "system" ? "check" : undefined,
         onPress: select("system"),
         variant: "compact",
       },
       {
         left: "moon",
-        label: "Dark",
+        label: "深色",
         right: colorScheme === "dark" ? "check" : undefined,
         onPress: select("dark"),
         variant: "compact",
       },
       {
         left: "sun",
-        label: "Light",
+        label: "浅色",
         right: colorScheme === "light" ? "check" : undefined,
         onPress: select("light"),
         variant: "compact",

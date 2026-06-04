@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jgalat/remote-app.git",
+    "url": "git+https://github.com/gmcf111/remote-appzhcn.git",
     "directory": "packages/qbittorrent-client"
   },
   "main": "dist/index.cjs",

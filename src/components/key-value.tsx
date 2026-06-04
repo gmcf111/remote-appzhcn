@@ -24,7 +24,7 @@ export default React.memo(function KeyValue({
 
   const onCopy = React.useCallback(async () => {
     await Clipboard.setStringAsync(value.toString());
-    ToastAndroid.show("Magnet Link copied", ToastAndroid.SHORT);
+    ToastAndroid.show("Magnet 链接已复制", ToastAndroid.SHORT);
   }, [value]);
 
   return (
@@ -38,7 +38,7 @@ export default React.memo(function KeyValue({
         {copy ? (
           <Pressable style={styles.pressable} onPress={onCopy}>
             <Feather name="clipboard" color={tint} size={16} />
-            <Text style={[styles.value, { color: tint }]}> Copy</Text>
+            <Text style={[styles.value, { color: tint }]}> 复制</Text>
           </Pressable>
         ) : (
           <Text style={[styles.value, { color: gray }]}>{value}</Text>

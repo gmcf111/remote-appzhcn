@@ -62,7 +62,7 @@ function MoveTorrentSheet({
 
     SheetManager.show(SELECT_SHEET_ID, {
       payload: {
-        title: "Select directory",
+        title: "选择目录",
         options,
         onSelect: (value) => setLocationText(String(value)),
       },
@@ -77,7 +77,7 @@ function MoveTorrentSheet({
       { ids, location: location.trim(), move: true },
       {
         onSuccess: () => {
-          ToastAndroid.show("Torrent moved", ToastAndroid.SHORT);
+          ToastAndroid.show("种子已移动", ToastAndroid.SHORT);
         },
       }
     );
@@ -102,7 +102,7 @@ function MoveTorrentSheet({
       gestureEnabled
     >
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-        <Text style={styles.title}>Move</Text>
+        <Text style={styles.title}>移动</Text>
         <View style={styles.inputRow}>
           <TextInput
             placeholder="/downloads"
@@ -116,7 +116,7 @@ function MoveTorrentSheet({
           </Pressable>
         </View>
         <Button
-          title="move"
+          title="移动"
           onPress={onMove}
           disabled={!location.trim()}
           style={styles.button}

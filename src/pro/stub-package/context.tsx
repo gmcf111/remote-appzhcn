@@ -4,7 +4,7 @@ import useNonNullContext from "~/hooks/use-non-null-context";
 
 const stubValue: ProContextValue = {
   available: false,
-  isPro: false,
+  isPro: true,
   devOverride: false,
   setDevOverride: () => {},
 };

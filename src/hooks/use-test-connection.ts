@@ -26,7 +26,7 @@ export type TestConnectionResult = {
 
 async function testConnection(params: TestConnectionParams): Promise<TestConnectionResult> {
   if (isTestingServer(params)) {
-    return { connected: true, message: "Connected" };
+    return { connected: true, message: "已连接" };
   }
 
   const config = { url: params.url, username: params.username, password: params.password };
@@ -37,7 +37,7 @@ async function testConnection(params: TestConnectionParams): Promise<TestConnect
 
   try {
     await client.ping();
-    return { connected: true, message: "Connected" };
+    return { connected: true, message: "已连接" };
   } catch (e) {
     if (e instanceof Error) {
       const error: TestConnectionResult["error"] = {
@@ -48,10 +48,10 @@ async function testConnection(params: TestConnectionParams): Promise<TestConnect
       if ("body" in e && typeof e.body === "string") error.body = e.body;
       const msg = error.status
         ? e.message ? `${error.status}: ${e.message}` : `HTTP ${error.status}`
-        : e.message || "Unknown error";
+        : e.message || "未知错误";
       return { connected: false, message: msg, error };
     }
-    return { connected: false, message: "Unknown error" };
+    return { connected: false, message: "未知错误" };
   }
 }
 

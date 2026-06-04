@@ -48,7 +48,7 @@ const Form = z
     type: z
       .enum(["transmission", "qbittorrent", "local"])
       .default("transmission"),
-    name: z.string().max(16, "max. of 16 characters"),
+    name: z.string().max(16, "最多 16 个字符"),
     host: z.string(),
     port: z.coerce.number().optional(),
     path: z.string().optional(),
@@ -62,14 +62,14 @@ const Form = z
       ctx.addIssue({
         path: ["name"],
         code: z.ZodIssueCode.custom,
-        message: "name is required",
+        message: "请输入名称",
       });
     }
     if (data.type !== "local" && !data.host) {
       ctx.addIssue({
         path: ["host"],
         code: z.ZodIssueCode.custom,
-        message: "host / IP address is required",
+        message: "请输入主机或 IP 地址",
       });
     }
     if (data.type !== "local" && data.useAuth) {
@@ -77,14 +77,14 @@ const Form = z
         ctx.addIssue({
           path: ["username"],
           code: z.ZodIssueCode.custom,
-          message: "username is required",
+          message: "请输入用户名",
         });
       }
       if (!data.password) {
         ctx.addIssue({
           path: ["password"],
           code: z.ZodIssueCode.custom,
-          message: "password is required",
+          message: "请输入密码",
         });
       }
     }
@@ -230,7 +230,7 @@ export default function ConnectionScreen() {
     watchedType === "qbittorrent" ? "qbittorrent" : "transmission";
   const scroll = React.useRef<KeyboardAwareScrollViewRef>(null);
 
-  const { isPro, available } = usePro();
+  const { available } = usePro();
   const { mutate: ensureLocalServer } = useEnsureLocalServer();
   const { mutate: resumeLocalEngine, isPending: isResuming } =
     useResumeLocalEngine();
@@ -264,7 +264,7 @@ export default function ConnectionScreen() {
     ];
     if (canPickLocal) {
       out.push({
-        label: "Local (libtorrent4j) — beta",
+        label: "本地 (libtorrent4j) — 测试版",
         left: "hard-drive",
         value: "local",
       });
@@ -335,10 +335,6 @@ export default function ConnectionScreen() {
   const onSubmit = React.useCallback(
     (f: Form) => {
       if (f.type === "local") {
-        if (!isPro) {
-          router.replace("/paywall");
-          return;
-        }
         // Best-effort: ensure POST_NOTIFICATIONS is granted so the foreground
         // service notification is visible. The system handles "already granted".
         Notifications.getPermissionsAsync()
@@ -353,7 +349,7 @@ export default function ConnectionScreen() {
         ensureLocalServer(f.name?.trim() || "remote", {
           onSuccess: () => router.back(),
           onError: () => {
-            ToastAndroid.show("Failed to save local service", ToastAndroid.SHORT);
+            ToastAndroid.show("保存本地服务失败", ToastAndroid.SHORT);
           },
         });
         return;
@@ -389,7 +385,7 @@ export default function ConnectionScreen() {
       }
       router.back();
     },
-    [editServer, servers, router, store, isPro, ensureLocalServer]
+    [editServer, servers, router, store, ensureLocalServer]
   );
 
 
@@ -399,10 +395,10 @@ export default function ConnectionScreen() {
     mutate: test,
   } = useTestConnection();
 
-  const status = isPending ? "Connecting..." : data ? data.message : "Not connected";
+  const status = isPending ? "正在连接..." : data ? data.message : "未连接";
   const hasError = data ? !data.connected : false;
   const statusColor =
-    status === "Not connected" || status === "Connecting..."
+    status === "未连接" || status === "Connecting..."
       ? gray
       : data?.connected
       ? green
@@ -433,9 +429,9 @@ export default function ConnectionScreen() {
         contentInset={{ bottom: inset.bottom }}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsSectionTitle title="Connection" first />
+        <SettingsSectionTitle title="连接" first />
 
-        <SettingsFieldRow label="Client type" reserveErrorSpace>
+        <SettingsFieldRow label="客户端类型" reserveErrorSpace>
           <Controller
             name="type"
             control={control}
@@ -445,7 +441,7 @@ export default function ConnectionScreen() {
                 value={field.value}
                 onChange={onTypeChange}
                 options={typeOptions}
-                title="Client Type"
+                title="客户端类型"
               />
             )}
           />
@@ -459,7 +455,7 @@ export default function ConnectionScreen() {
               <SettingsFieldRow
                 label={
                   <Text style={styles.label}>
-                    Name <Required />
+                    名称 <Required />
                   </Text>
                 }
                 error={fieldState.error?.message}
@@ -467,7 +463,7 @@ export default function ConnectionScreen() {
               >
                 <TextInput
                   variant="settings"
-                  placeholder="remote server"
+                  placeholder="远程服务器"
                   style={fieldState.error ? { borderColor: red } : undefined}
                   onChangeText={field.onChange}
                   value={field.value?.toString() || ""}
@@ -479,15 +475,15 @@ export default function ConnectionScreen() {
 
         {isLocal && batteryOpt.available && (
           <>
-            <SettingsSectionTitle title="Permissions" />
+            <SettingsSectionTitle title="权限" />
             <SettingsFieldRow>
               <Toggle
                 variant="settings"
-                label="Ignore battery optimization"
+                label="忽略电池优化"
                 description={
                   batteryOpt.ignored
-                    ? "Doze won't throttle the engine."
-                    : "Doze may throttle peer activity in the background."
+                    ? "Doze 不会限制引擎运行。"
+                    : "后台运行时 Doze 可能会限制 Peer 活动。"
                 }
                 value={batteryOpt.ignored}
                 onPress={() => {
@@ -507,7 +503,7 @@ export default function ConnectionScreen() {
                 <SettingsFieldRow
                   label={
                     <Text style={styles.label}>
-                      Host / IP address <Required />
+                      主机 / IP 地址 <Required />
                     </Text>
                   }
                   error={fieldState.error?.message}
@@ -529,7 +525,7 @@ export default function ConnectionScreen() {
               control={control}
               render={({ field, fieldState }) => (
                 <SettingsFieldRow
-                  label="Port"
+                  label="端口"
                   error={fieldState.error?.message}
                   reserveErrorSpace
                 >
@@ -550,7 +546,7 @@ export default function ConnectionScreen() {
               control={control}
               render={({ field, fieldState }) => (
                 <SettingsFieldRow
-                  label="Path"
+                  label="路径"
                   error={fieldState.error?.message}
                   reserveErrorSpace
                 >
@@ -565,7 +561,7 @@ export default function ConnectionScreen() {
               )}
             />
 
-            <SettingsSectionTitle title="Security" />
+            <SettingsSectionTitle title="安全" />
 
         <SettingsFieldRow>
           <Controller
@@ -575,7 +571,7 @@ export default function ConnectionScreen() {
               <Toggle
                 variant="settings"
                 label="SSL/HTTPS"
-                description="Use a secure HTTPS connection."
+                description="使用安全的 HTTPS 连接。"
                 value={field.value}
                 onPress={onSSLChange}
               />
@@ -590,8 +586,8 @@ export default function ConnectionScreen() {
             render={({ field }) => (
               <Toggle
                 variant="settings"
-                label="Authentication"
-                description="Require username and password."
+                label="身份验证"
+                description="需要用户名和密码。"
                 value={field.value}
                 onPress={onUseAuthChange}
               />
@@ -608,7 +604,7 @@ export default function ConnectionScreen() {
                 <SettingsFieldRow
                   label={
                     <Text style={styles.label}>
-                      Username <Required />
+                      用户名 <Required />
                     </Text>
                   }
                   error={fieldState.error?.message}
@@ -631,7 +627,7 @@ export default function ConnectionScreen() {
                 <SettingsFieldRow
                   label={
                     <Text style={styles.label}>
-                      Password <Required />
+                      密码 <Required />
                     </Text>
                   }
                   error={fieldState.error?.message}
@@ -652,7 +648,7 @@ export default function ConnectionScreen() {
 
             <View style={[styles.connectionCard, { borderColor: gray }]}>
               <View style={styles.connectionHeader}>
-                <Text style={styles.label}>Connection</Text>
+                <Text style={styles.label}>连接</Text>
                 {hasError && data?.error ? (
                   <Pressable
                     style={styles.statusPressable}
@@ -684,7 +680,7 @@ export default function ConnectionScreen() {
             </View>
 
             <Button
-              title="test connection"
+              title="测试连接"
               onPress={handleSubmit(onTest)}
               style={{ marginTop: 8, marginBottom: 8, backgroundColor: green }}
             />
@@ -708,9 +704,17 @@ export default function ConnectionScreen() {
                   ]}
                 >
                   <View style={styles.connectionHeader}>
-                    <Text style={styles.label}>Service</Text>
+                    <Text style={styles.label}>服务</Text>
                     <Text color={stateColor} style={styles.connectionState}>
-                      {engineStatus.state}
+                      {engineStatus.state === "stopped"
+                        ? "已停止"
+                        : engineStatus.state === "running"
+                          ? "运行中"
+                          : engineStatus.state === "starting"
+                            ? "启动中"
+                            : engineStatus.state === "stopping"
+                              ? "停止中"
+                              : "错误"}
                     </Text>
                   </View>
                   <ProgressBar progress={100} color={stateColor} />
@@ -721,8 +725,8 @@ export default function ConnectionScreen() {
             <Button
               title={
                 engineStatus.state === "running"
-                  ? "restart local service"
-                  : "start local service"
+                  ? "重启本地服务"
+                  : "启动本地服务"
               }
               onPress={() => resumeLocalEngine(undefined)}
               disabled={isResuming || isStopping}
@@ -730,7 +734,7 @@ export default function ConnectionScreen() {
             />
             {engineStatus.state !== "stopped" && (
               <Button
-                title="stop local service"
+                title="停止本地服务"
                 onPress={() => stopLocalEngine(undefined)}
                 disabled={isStopping || isResuming}
                 style={{ marginTop: 0, marginBottom: 16, backgroundColor: red }}
@@ -739,7 +743,7 @@ export default function ConnectionScreen() {
           </>
         ) : (
           <Button
-            title="save"
+            title="保存"
             onPress={handleSubmit(onSubmit)}
             style={{ marginTop: 8, marginBottom: 16 }}
           />

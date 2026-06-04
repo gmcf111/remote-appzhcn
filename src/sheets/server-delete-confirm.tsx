@@ -32,7 +32,7 @@ function ServerDeleteConfirmSheet({
     if (ids.has(LOCAL_SERVER_ID)) {
       removeLocal(undefined, {
         onError: () =>
-          ToastAndroid.show("Failed to clean up local engine", ToastAndroid.SHORT),
+          ToastAndroid.show("清理本地引擎失败", ToastAndroid.SHORT),
       });
       ids.delete(LOCAL_SERVER_ID);
       if (ids.size === 0) {
@@ -61,10 +61,10 @@ function ServerDeleteConfirmSheet({
 
   return (
     <ActionSheet
-      title={`Delete ${payload?.label ?? "server"}?`}
+      title={`删除 ${payload?.label ?? "服务器"}？`}
       options={[
         {
-          label: "Delete",
+          label: "删除",
           left: "trash",
           color: red,
           onPress: onDelete,
